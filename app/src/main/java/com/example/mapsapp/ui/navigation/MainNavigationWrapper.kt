@@ -6,10 +6,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mapsapp.ui.screens.DrawerScreen
 import com.example.mapsapp.ui.screens.PermissionsScreen
+import com.example.mapsapp.viewmodels.ViewModelApp
 
 //comprueba permisos, si los tenemos navega a la pantalla drawer
 @Composable
-fun Navigation(){
+fun Navigation(viewModelApp: ViewModelApp){
     val navController = rememberNavController()
     NavHost(navController, Destination.Permissions) {
         composable<Destination.Permissions> {
@@ -18,7 +19,7 @@ fun Navigation(){
             }
         }
         composable<Destination.Drawer> {
-            DrawerScreen()
+            DrawerScreen(viewModelApp)
         }
     }
 }

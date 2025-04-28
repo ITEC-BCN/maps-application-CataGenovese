@@ -23,11 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.mapsapp.ui.navigation.InternalNavigation
+import com.example.mapsapp.viewmodels.ViewModelApp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerScreen() {
+fun DrawerScreen(viewModelApp: ViewModelApp) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -70,7 +71,9 @@ fun DrawerScreen() {
                 )
             }
         ) { innerPadding ->
-            InternalNavigation(navController, Modifier.padding(innerPadding))
+            InternalNavigation(navController,padding = Modifier.padding(innerPadding),
+                viewModelApp = viewModelApp,
+                modifier = Modifier)
         }
     }
 }

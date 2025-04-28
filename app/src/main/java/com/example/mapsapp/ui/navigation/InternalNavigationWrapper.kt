@@ -11,18 +11,24 @@ import com.example.mapsapp.ui.screens.MarkerScreen
 import com.example.mapsapp.viewmodels.ViewModelApp
 
 @Composable
-fun InternalNavigation(navController: NavHostController, padding: Modifier) {
+fun InternalNavigation(navController: NavHostController, padding: Modifier, viewModelApp: ViewModelApp, modifier: Modifier) {
     NavHost(navController, Destination.Map) {
         //mapa
         composable<Destination.Map> {
-            MapsScreen()
+            MapsScreen(modifier) { coordenades ->
+                navController.navigate(Destination.MarkerCreation(coordenades))
+            }
         }
 
+        //listScreen marcadores
         composable<Destination.MarkerCreation> { backStackEntry ->
             val markerCreation = backStackEntry.toRoute<Destination.MarkerCreation>()
-            MarkerScreen(markerCreation.coordenades, viewModelApp = ViewModelApp()) {
-                navController.navigate(Map) {
-                    popUpTo<Map>{inclusive=true}
+            MarkerScreen(
+                coordenades = markerCreation.coordenades,
+                viewModelApp = viewModelApp
+            ) {
+                navController.navigate(Destination.Map) {
+                    popUpTo<Destination.Map> { inclusive = true }
                 }
             }
         }

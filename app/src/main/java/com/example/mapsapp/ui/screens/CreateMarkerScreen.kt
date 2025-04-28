@@ -7,14 +7,11 @@ import androidx.compose.runtime.Composable
 import com.example.mapsapp.viewmodels.ViewModelApp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import io.ktor.websocket.Frame.Text
 
 @Composable
-fun MarkerScreen(coordenades: String, viewModelApp: ViewModelApp, function: () -> Unit) {
+fun MarkerScreen(coordenades: String, viewModelApp: ViewModelApp, navigateToDetailMarker: (String) -> Unit) {
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState(" ")
 
@@ -31,6 +28,11 @@ fun MarkerScreen(coordenades: String, viewModelApp: ViewModelApp, function: () -
         label = { Text(text = "Description") }
     )
 
+    Button(onClick = {
+
+    }) {
+        Text("Marker")
+    }
 
 
 }
