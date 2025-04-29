@@ -1,5 +1,4 @@
 package com.example.mapsapp.viewmodels
-
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mapsapp.MyApp
@@ -45,6 +44,7 @@ class ViewModelApp : ViewModel() {
 
     /*CRUD*/
 
+    //obtenir tots els markers
     fun getAllMarkers() {
         CoroutineScope(Dispatchers.IO).launch {
             val databaseMarkers = database.getAllMarkers()
@@ -54,6 +54,7 @@ class ViewModelApp : ViewModel() {
         }
     }
 
+    //crear un marker
     fun insertNewMarker(name: String, description: String, lat: Double, long:Double, foto: String) {
         val newMarker = Marker_bdd(
             id = 0,
@@ -69,6 +70,7 @@ class ViewModelApp : ViewModel() {
         }
     }
 
+    //actualitzar un marker
     fun updateMarker(
         id: Int,
         name: String,
@@ -83,6 +85,7 @@ class ViewModelApp : ViewModel() {
         }
     }
 
+    //eliminar un marker
     fun deleteMarker(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             database.deleteMarker(id.toString())
@@ -90,6 +93,7 @@ class ViewModelApp : ViewModel() {
         }
     }
 
+    //obtenir nomes un marker
     fun getMarker(id: Int) {
         if (_actualMarker == null) {
             CoroutineScope(Dispatchers.IO).launch {
