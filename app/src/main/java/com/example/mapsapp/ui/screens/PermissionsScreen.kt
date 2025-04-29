@@ -2,8 +2,6 @@ package com.example.mapsapp.ui.screens
 
 import androidx.compose.ui.platform.LocalContext
 import com.example.mapsapp.utils.PermissionStatus
-
-
 import android.Manifest
 import android.app.Activity
 import android.content.Intent

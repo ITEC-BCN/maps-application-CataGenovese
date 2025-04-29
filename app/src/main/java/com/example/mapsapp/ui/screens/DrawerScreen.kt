@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.example.mapsapp.ui.navigation.InternalNavigation
 import com.example.mapsapp.viewmodels.ViewModelApp
@@ -63,12 +64,16 @@ fun DrawerScreen(viewModelApp: ViewModelApp) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Awesome App") },
+                    title = { Text("Cata's App") },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
                         }
-                    }
+                    },
+                    colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFFF3EEE3),
+                        titleContentColor = Color.Black
+                    )
                 )
             }
         ) { innerPadding ->

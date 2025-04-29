@@ -1,5 +1,6 @@
 package com.example.mapsapp.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,8 +31,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.mapsapp.R
 
 
 @Composable
@@ -43,50 +47,60 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
     val markerName: String by vM.namePlace.observeAsState(" ")
     val description: String by vM.description.observeAsState("")
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 120.dp)
-    ) {
-
-        Text(
-            text = "Markers List",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(bottom = 12.dp),
-            color = Color.DarkGray
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.map2),
+            contentDescription = "wallpaper",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 120.dp)
+        ) {
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        )
-        {
-            items(markerList) { marker ->
-                val dissmissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = {
-                        if (it == SwipeToDismissBoxValue.EndToStart) {
-                            vM.deleteMarker(marker.id)
-                            true
-                        } else {
-                            false
+            Text(
+                text = "Markers List",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 12.dp),
+                color = Color.DarkGray
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+            {
+                items(markerList) { marker ->
+                    val dissmissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = {
+                            if (it == SwipeToDismissBoxValue.EndToStart) {
+                                vM.deleteMarker(marker.id)
+                                true
+                            } else {
+                                false
+                            }
                         }
-                    }
-                )
-                SwipeToDismissBox(state = dissmissState, backgroundContent = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(Color.Red)
-                            .padding(horizontal = 20.dp),
-                        contentAlignment = Alignment.BottomEnd
-                    ) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                    }
-                }) {
-                    MarkerItem(marker) {
-                        navigateToDetail(marker.id)
+                    )
+                    SwipeToDismissBox(state = dissmissState, backgroundContent = {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(Color.Red)
+                                .padding(horizontal = 20.dp),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                    }) {
+                        MarkerItem(marker) {
+                            navigateToDetail(marker.id)
+                        }
                     }
                 }
             }
@@ -100,16 +114,17 @@ fun MarkerItem(marker: Marker_bdd, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
-            .border(width = 1.dp, color = Color.LightGray)
+            .background(Color(0xFFF3EEE3))
+            .border(width = 1.dp, color = Color.Black)
             .clickable { navigateToDetail(marker.id) }
             .padding(16.dp)
     ) {
         Text(
             text = marker.name,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.Black
-        )
+            fontSize = 18.5.sp,
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+
+            )
     }
 }
