@@ -1,9 +1,16 @@
 package com.example.mapsapp.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Marker_bdd(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val name: String,
     val description: String,
-    val coordenades: String,
-    val foto: String
+    val lat: Double,
+    val long: Double,
+    val foto: String = "fotoCataySanti"
 )

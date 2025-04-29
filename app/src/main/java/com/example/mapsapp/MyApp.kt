@@ -1,3 +1,5 @@
+package com.example.mapsapp
+
 import android.app.Application
 import com.example.mapsapp.ui.navigation.MySupabaseClient
 

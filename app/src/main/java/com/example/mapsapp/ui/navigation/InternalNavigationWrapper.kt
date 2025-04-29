@@ -15,8 +15,8 @@ fun InternalNavigation(navController: NavHostController, padding: Modifier, view
     NavHost(navController, Destination.Map) {
         //mapa
         composable<Destination.Map> {
-            MapsScreen(modifier) { coordenades ->
-                navController.navigate(Destination.MarkerCreation(coordenades))
+            MapsScreen(modifier) { lat, long ->
+                navController.navigate(Destination.MarkerCreation(lat, long))
             }
         }
 
@@ -24,7 +24,8 @@ fun InternalNavigation(navController: NavHostController, padding: Modifier, view
         composable<Destination.MarkerCreation> { backStackEntry ->
             val markerCreation = backStackEntry.toRoute<Destination.MarkerCreation>()
             MarkerScreen(
-                coordenades = markerCreation.coordenades,
+                lat = markerCreation.lat,
+                long= markerCreation.long,
                 viewModelApp = viewModelApp
             ) {
                 navController.navigate(Destination.Map) {
@@ -34,3 +35,4 @@ fun InternalNavigation(navController: NavHostController, padding: Modifier, view
         }
     }
 }
+

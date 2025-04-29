@@ -39,14 +39,15 @@ class MySupabaseClient() {
         id: Int,
         name: String,
         description: String,
-        coordenades: String,
-        foto: String
+        lat: Double,
+        long: Double,
+        foto: String,
     ) {
         client.from("Map").update({
             set("name", name)
             set("description", description)
-            set("description", description)
-            set("coordenades", coordenades)
+            set("lat", lat)
+            set("long", long)
             set("foto", foto)
         }) {
             filter {

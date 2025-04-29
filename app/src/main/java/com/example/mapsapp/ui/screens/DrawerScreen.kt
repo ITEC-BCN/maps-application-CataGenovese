@@ -36,6 +36,7 @@ fun DrawerScreen(viewModelApp: ViewModelApp) {
     var selectedItemIndex by remember { mutableStateOf(0) }
     //Element que conté el menú que veurem en polsar sobre la icona d’hamburguesa
     ModalNavigationDrawer(
+        gesturesEnabled = false,
         drawerContent = {
             ModalDrawerSheet {
                 DrawerItem.entries.forEachIndexed { index, drawerItem ->

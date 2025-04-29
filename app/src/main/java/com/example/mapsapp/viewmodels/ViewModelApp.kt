@@ -1,10 +1,9 @@
 package com.example.mapsapp.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.mapsapp.MyApp
 import com.example.mapsapp.data.Marker_bdd
-import com.example.mapsapp.ui.navigation.MySupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,15 +21,16 @@ class ViewModelApp : ViewModel() {
     private val _description = MutableLiveData<String>()
     val description = _description
 
+    //val img
+    private val _img= MutableLiveData<String>()
+    val img= _img
+
     //markerActual
     private var _actualMarker: Marker_bdd? = null
 
     //lista marcadores
     private val _markersList = MutableLiveData<List<Marker_bdd>>()
     val markerList = _markersList
-
-    //coordenades
-    private val coordenades = MutableLiveData<Long>()
 
 
     /*========SETTERS========*/
@@ -54,12 +54,13 @@ class ViewModelApp : ViewModel() {
         }
     }
 
-    fun insertNewMarker(name: String, description: String, coordenades: String, foto: String) {
+    fun insertNewMarker(name: String, description: String, lat: Double, long:Double, foto: String) {
         val newMarker = Marker_bdd(
             id = 0,
             name = name,
             description = description,
-            coordenades = coordenades,
+            lat= lat,
+            long= long,
             foto = foto
         )
         CoroutineScope(Dispatchers.IO).launch {
@@ -72,11 +73,12 @@ class ViewModelApp : ViewModel() {
         id: Int,
         name: String,
         description: String,
-        coordenades: String,
+        lat: Double,
+        long:Double,
         foto: String
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            database.updateMarker(id, name, description, coordenades, foto)
+            database.updateMarker(id, name, description, lat, long, foto)
             getAllMarkers()
         }
     }
