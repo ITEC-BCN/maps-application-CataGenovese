@@ -1,4 +1,5 @@
 package com.example.mapsapp.viewmodels
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mapsapp.MyApp
@@ -21,11 +22,12 @@ class ViewModelApp : ViewModel() {
     val description = _description
 
     //val img
-    private val _img= MutableLiveData<String>()
-    val img= _img
+    private val _img = MutableLiveData<String>()
+    val img = _img
 
     //markerActual
-    private var _actualMarker: Marker_bdd? = null
+    private var _actualMarker = MutableLiveData<Marker_bdd>()
+    val actualMarker = _actualMarker
 
     //lista marcadores
     private val _markersList = MutableLiveData<List<Marker_bdd>>()
@@ -55,13 +57,19 @@ class ViewModelApp : ViewModel() {
     }
 
     //crear un marker
-    fun insertNewMarker(name: String, description: String, lat: Double, long:Double, foto: String) {
+    fun insertNewMarker(
+        name: String,
+        description: String,
+        lat: Double,
+        long: Double,
+        foto: String
+    ) {
         val newMarker = Marker_bdd(
             id = 0,
             name = name,
             description = description,
-            lat= lat,
-            long= long,
+            lat = lat,
+            long = long,
             foto = foto
         )
         CoroutineScope(Dispatchers.IO).launch {
@@ -76,7 +84,7 @@ class ViewModelApp : ViewModel() {
         name: String,
         description: String,
         lat: Double,
-        long:Double,
+        long: Double,
         foto: String
     ) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -95,16 +103,15 @@ class ViewModelApp : ViewModel() {
 
     //obtenir nomes un marker
     fun getMarker(id: Int) {
-        if (_actualMarker == null) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val marker = database.getMarker(id)
-                withContext(Dispatchers.Main) {
-                    _actualMarker = marker
-                    _namePlace.value = marker.name
-                    _description.value = marker.description
-                }
+        CoroutineScope(Dispatchers.IO).launch {
+            val marker = database.getMarker(id)
+            withContext(Dispatchers.Main) {
+                _actualMarker.value = marker
+                _namePlace.value = marker.name
+                _description.value = marker.description
             }
         }
+
     }
 
 }

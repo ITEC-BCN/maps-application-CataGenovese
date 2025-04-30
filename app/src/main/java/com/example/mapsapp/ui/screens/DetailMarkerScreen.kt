@@ -1,9 +1,11 @@
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -18,38 +20,48 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
     val vM = viewModel<ViewModelApp>()
-    vM.getMarker(id)
+    val actualMarker by vM.actualMarker.observeAsState()
+
     val markerName: String by vM.namePlace.observeAsState("")
     val markerDescription: String by vM.description.observeAsState("")
+
+    if(actualMarker==null) {
+        vM.getMarker(id)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        TextField(
-            value = markerName,
-            onValueChange = { vM.setName(it) },
-            label = { Text(text = "New Name") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-        )
+        if(actualMarker != null){
+            TextField(
+                value = markerName,
+                onValueChange = { vM.setName(it) },
+                label = { Text(text = "New Name") },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            )
 
-        // TextField para la descripción
-        TextField(
-            value = markerDescription,
-            onValueChange = { vM.setDescription(it) },
-            label = { Text(text = "New Description") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-        )
-        Button( onClick = {
-            vM.updateMarker(id, markerDescription, markerName, 3555.0, 223.0, " ")
-        } ) {
-            Text("Update")
+            // TextField para la descripción
+            TextField(
+                value = markerDescription,
+                onValueChange = { vM.setDescription(it) },
+                label = { Text(text = "New Description") },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            )
+            Button( onClick = {
+                vM.updateMarker(id, markerName, markerDescription, actualMarker!!.lat, actualMarker!!.long, actualMarker!!.foto)
+            } ) {
+                Text("Update")
+            }
+            Button(onClick = {
+                navigateBack()
+            }) {
+                Text("Turn back")
+            }
         }
-        Button(onClick = {
-            navigateBack()
-        }) {
-            Text("Turn back")
+        else{
+            CircularProgressIndicator()
         }
     }
 }

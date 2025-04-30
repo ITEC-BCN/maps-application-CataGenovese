@@ -24,9 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.viewmodels.PermissionViewModel
@@ -34,9 +32,6 @@ import com.example.mapsapp.viewmodels.PermissionViewModel
 
 @Composable
 fun PermissionsScreen(navigateToDrawer: () -> Unit) {
-
-    //si permisos aprobados
-
     val activity = LocalContext.current
     val aviewModel = viewModel<PermissionViewModel>()
     val vM: PermissionViewModel = viewModel()
