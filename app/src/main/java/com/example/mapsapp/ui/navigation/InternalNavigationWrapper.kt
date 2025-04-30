@@ -18,12 +18,14 @@ fun InternalNavigation(
     navController: NavHostController,
     padding: Modifier,
     viewModelApp: ViewModelApp,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     NavHost(navController, Destination.Map) {
         //mapa
         composable<Destination.Map> {
-            MapsScreen(modifier) { lat, long ->
+            MapsScreen(modifier, { id ->
+                navController.navigate(Destination.MarkerDetail(id))
+            }) { lat, long ->
                 navController.navigate(Destination.MarkerCreation(lat, long))
             }
         }

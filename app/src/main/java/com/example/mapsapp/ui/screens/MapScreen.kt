@@ -18,7 +18,11 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.compose.runtime.getValue
 
 @Composable
-fun MapsScreen(modifier: Modifier = Modifier, navigateToMarkerScreen: (Double, Double) -> Unit, navigateToDetail: () -> Unit) {
+fun MapsScreen(
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Int) -> Unit,
+    navigateToMarkerScreen: (Double, Double) -> Unit
+) {
     val vM = viewModel<ViewModelApp>()
     val markerList by vM.markerList.observeAsState(emptyList())
     vM.getAllMarkers()
@@ -46,10 +50,10 @@ fun MapsScreen(modifier: Modifier = Modifier, navigateToMarkerScreen: (Double, D
             markerList.forEach { marker ->
                 Marker(
                     state = MarkerState(position = LatLng(marker.lat, marker.long)),
-                    title= marker.name,
+                    title = marker.name,
                     snippet = marker.description,
                     onClick = {
-                        navigateToDetail()
+                        navigateToDetail(marker.id)
                         true
                     }
                 )
