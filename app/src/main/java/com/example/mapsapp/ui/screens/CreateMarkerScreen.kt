@@ -40,9 +40,15 @@ import androidx.core.content.FileProvider
 import java.io.File
 
 @Composable
-fun MarkerScreen(lat: Double, long: Double, viewModelApp: ViewModelApp, navigateToDetailMarker: (String) -> Unit) {
+fun MarkerScreen(
+    lat: Double,
+    long: Double,
+    viewModelApp: ViewModelApp,
+    navigateToDetailMarker: (String) -> Unit
+) {
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState("")
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     Column(
         modifier = Modifier
@@ -72,13 +78,15 @@ fun MarkerScreen(lat: Double, long: Double, viewModelApp: ViewModelApp, navigate
         )
 
         //Camara
-        CameraScreen()
+        CameraScreen(onImageCaptured = { uri ->
+            selectedImageUri = uri
+        })
 
         // Botón para crear el marcador
         Button(
             onClick = {
                 //qual clickem s'afegeix a la bdd
-                viewModelApp.insertNewMarker(name, description, lat, long, foto = "xd")
+                viewModelApp.insertNewMarker(name, description, lat, long, foto = selectedImageUri?.toString() ?: "No image")
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -88,7 +96,7 @@ fun MarkerScreen(lat: Double, long: Double, viewModelApp: ViewModelApp, navigate
 }
 
 @Composable
-fun CameraScreen() {
+fun CameraScreen(onImageCaptured: (Uri) -> Unit) {
     val context = LocalContext.current
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     val bitmap = remember { mutableStateOf<Bitmap?>(null) }
@@ -96,15 +104,16 @@ fun CameraScreen() {
     val takePictureLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && imageUri.value != null) {
+                onImageCaptured(imageUri.value!!)
                 val stream = context.contentResolver.openInputStream(imageUri.value!!)
                 bitmap.value = BitmapFactory.decodeStream(stream)
             }
         }
-
     val pickImageLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 imageUri.value = it
+                onImageCaptured(it)
                 val stream = context.contentResolver.openInputStream(it)
                 bitmap.value = BitmapFactory.decodeStream(stream)
             }

@@ -12,5 +12,5 @@ data class Marker_bdd(
     val description: String,
     val lat: Double,
     val long: Double,
-    val foto: String = "fotoCataiSanti"
+    val foto: String
 )

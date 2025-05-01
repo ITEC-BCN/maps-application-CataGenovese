@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -15,7 +16,9 @@ import com.example.mapsapp.viewmodels.ViewModelApp
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 @Composable
 fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
@@ -24,6 +27,8 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
 
     val markerName: String by vM.namePlace.observeAsState("")
     val markerDescription: String by vM.description.observeAsState("")
+    //si te foto
+    val fotoUrl = actualMarker?.foto
 
     if(actualMarker==null) {
         vM.getMarker(id)
@@ -49,6 +54,19 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                 label = { Text(text = "New Description") },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
+
+
+            // Mostrar la imagen
+            actualMarker?.foto?.let { fotoUrl ->
+                AsyncImage(
+                    model = fotoUrl,
+                    contentDescription = "Marker image",
+                    modifier = Modifier.size(200.dp),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Button( onClick = {
                 vM.updateMarker(id, markerName, markerDescription, actualMarker!!.lat, actualMarker!!.long, actualMarker!!.foto)
             } ) {
