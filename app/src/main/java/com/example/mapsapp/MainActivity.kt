@@ -27,8 +27,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             MapsAppTheme {
                 Navigation(viewModelApp)
-                }
             }
         }
     }
+}
 
