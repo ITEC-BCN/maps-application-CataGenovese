@@ -6,6 +6,7 @@ import com.example.mapsapp.MyApp
 import com.example.mapsapp.data.Marker_bdd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,12 +34,29 @@ class ViewModelApp : ViewModel() {
     private val _markersList = MutableLiveData<List<Marker_bdd>>()
     val markerList = _markersList
 
+    private val _missatgeAvis = MutableLiveData<String?>()
+    val missatgeAvis = _missatgeAvis
 
     /*========SETTERS========*/
 
     fun setName(name: String) {
         _namePlace.value = name
     }
+
+    //fem un c
+    fun setAvis() {
+        _missatgeAvis.value = null
+    }
+
+    fun setAvisCreate(string: String) {
+        _missatgeAvis.value = string // Set error message
+
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(2000) // Allow the message to stay visible for 2 seconds
+            _missatgeAvis.value = null
+        }
+    }
+
 
     fun setDescription(novaDescription: String) {
         _description.value = novaDescription
@@ -72,6 +90,7 @@ class ViewModelApp : ViewModel() {
             long = long,
             foto = foto
         )
+
         CoroutineScope(Dispatchers.IO).launch {
             database.insertMarker(newMarker)
             getAllMarkers()
@@ -87,9 +106,16 @@ class ViewModelApp : ViewModel() {
         long: Double,
         foto: String
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            database.updateMarker(id, name, description, lat, long, foto)
-            getAllMarkers()
+        if (name.isBlank() || description.isBlank()) {
+            _missatgeAvis.value = when {
+                name.isBlank() && description.isBlank() -> "Introdueix un nom i una descripció"
+                name.isBlank() -> "Introdueix un nom "
+                else -> "Introdueix una descripció"
+            }
+            CoroutineScope(Dispatchers.IO).launch {
+                database.updateMarker(id, name, description, lat, long, foto)
+                getAllMarkers()
+            }
         }
     }
 
@@ -114,4 +140,8 @@ class ViewModelApp : ViewModel() {
 
     }
 
+
+
 }
+
+

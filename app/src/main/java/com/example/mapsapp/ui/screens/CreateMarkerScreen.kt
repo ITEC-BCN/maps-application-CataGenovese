@@ -9,20 +9,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.example.mapsapp.viewmodels.ViewModelApp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +51,16 @@ fun MarkerScreen(
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState("")
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val errorMessage by viewModelApp.missatgeAvis.observeAsState()
+
+    // Show Snackbar when there's an error message
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it) // Show Snackbar
+            viewModelApp.setAvis() // Clear message after showing
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -57,7 +69,7 @@ fun MarkerScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // TextField para el nombre
+        // TextField for Name
         TextField(
             value = name,
             onValueChange = { viewModelApp.setName(it) },
@@ -67,7 +79,7 @@ fun MarkerScreen(
                 .padding(bottom = 8.dp)
         )
 
-        // TextField para la descripción
+        // TextField for Description
         TextField(
             value = description,
             onValueChange = { viewModelApp.setDescription(it) },
@@ -77,23 +89,53 @@ fun MarkerScreen(
                 .padding(bottom = 16.dp)
         )
 
-        //Camara
+        // Camera Component
         CameraScreen(onImageCaptured = { uri ->
             selectedImageUri = uri
         })
 
-        // Botón para crear el marcador
+        // Button to create marker with validation
         Button(
             onClick = {
-                //qual clickem s'afegeix a la bdd
-                viewModelApp.insertNewMarker(name, description, lat, long, foto = selectedImageUri?.toString() ?: "No image")
+                if (name.isBlank() || description.isBlank()) {
+                    viewModelApp.setAvisCreate(
+                        when {
+                            name.isBlank() && description.isBlank() -> "⚠️ Name and description required!"
+                            name.isBlank() -> "⚠️ Please enter a name!"
+                            else -> "⚠️ Please enter a description!"
+                        }
+                    )
+                } else {
+                    viewModelApp.insertNewMarker(
+                        name,
+                        description,
+                        lat,
+                        long,
+                        foto = selectedImageUri?.toString() ?: "No image"
+                    )
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Create Marker")
         }
+
+
+        // Snackbar Host (for notifications)
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.padding(top = 16.dp),
+            snackbar = { snackbarData ->
+                Snackbar(
+                    snackbarData = snackbarData,
+                    contentColor = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        )
     }
 }
+
 
 @Composable
 fun CameraScreen(onImageCaptured: (Uri) -> Unit) {

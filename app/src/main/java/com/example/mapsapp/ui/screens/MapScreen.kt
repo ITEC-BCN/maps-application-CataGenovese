@@ -3,6 +3,7 @@ package com.example.mapsapp.ui.screens
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -55,7 +56,7 @@ fun MapsScreen(
                     onClick = {
                         navigateToDetail(marker.id)
                         true
-                    }
+                    },
                 )
             }
         }
