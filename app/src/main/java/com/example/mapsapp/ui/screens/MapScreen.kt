@@ -3,6 +3,7 @@ package com.example.mapsapp.ui.screens
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +36,9 @@ import com.google.maps.android.compose.MapType
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.Alignment
 
+
 @Composable
+//screen principal de l'app
 fun MapsScreen(
     navigateToDetail: (Int) -> Unit,
     navigateToMarkerScreen: (Double, Double) -> Unit,
@@ -60,13 +63,16 @@ fun MapsScreen(
 
     vM.getAllMarkers()
 
-    Column(modifier = Modifier.fillMaxSize() .background(color = Color(0xFFF3EEE3))) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color(0xFFF3EEE3))) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 80.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
+            //cridem a la funcio del dropdown menu
             MapTypeDropdownInMap(
                 expanded = expanded,
                 selectedMapType = selectedMapType,
@@ -86,6 +92,7 @@ fun MapsScreen(
             position = CameraPosition.fromLatLngZoom(itb, 17f)
         }
 
+        //google maps
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -96,12 +103,14 @@ fun MapsScreen(
                 navigateToMarkerScreen(it.latitude, it.longitude)
             }
         ) {
+            //marker default; l'iniciem al itb
             Marker(
                 state = MarkerState(position = itb),
                 title = "ITB",
                 snippet = "Marker at ITB"
             )
 
+            //loop perque els markers apareguin dins del mapa
             markerList.forEach { marker ->
                 Marker(
                     state = MarkerState(position = LatLng(marker.lat, marker.long)),
@@ -119,6 +128,7 @@ fun MapsScreen(
 }
 
 
+//funcio dropdown menu amb els tipus de relleus
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapTypeDropdownInMap(
@@ -144,7 +154,9 @@ fun MapTypeDropdownInMap(
             },
             modifier = Modifier
                 .menuAnchor()
-                .padding(4.dp),
+                .padding(4.dp)
+                //aixo fa que el mapa no estigui obert per default
+                .clickable { onExpandedChange(!expanded) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,

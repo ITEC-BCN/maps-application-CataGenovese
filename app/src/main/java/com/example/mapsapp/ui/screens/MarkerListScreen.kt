@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.mapsapp.R
 
 
+//funcio llista de markers
 @Composable
 fun ListMarkers(navigateToDetail: (Int) -> Unit) {
     val vM = viewModel<ViewModelApp>()

@@ -47,7 +47,7 @@ class ViewModelApp : ViewModel() {
     val missatgeAvis = _missatgeAvis
 
     //expanded menu
-    private val _expanded= MutableLiveData<Boolean>(true)
+    private val _expanded= MutableLiveData<Boolean>(false)
     val expanded= _expanded
 
     //imatge
