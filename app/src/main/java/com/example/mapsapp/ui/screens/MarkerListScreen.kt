@@ -44,8 +44,6 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
     val vM = viewModel<ViewModelApp>()
     val markerList by vM.markerList.observeAsState(emptyList<Marker_bdd>())
     vM.getAllMarkers()
-    val markerName: String by vM.namePlace.observeAsState(" ")
-    val description: String by vM.description.observeAsState("")
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -57,7 +55,7 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 120.dp)
+                .padding(horizontal = 16.dp, vertical = 147.dp)
         ) {
 
             Text(

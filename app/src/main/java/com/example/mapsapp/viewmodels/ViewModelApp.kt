@@ -46,24 +46,44 @@ class ViewModelApp : ViewModel() {
     private val _missatgeAvis = MutableLiveData<String?>()
     val missatgeAvis = _missatgeAvis
 
-//    //imatge
-//    var selectedImageUri = mutableStateOf<Uri?>(null)
-//        private set
-//
-//    // El estado del snackbar
-//    val snackbarHostState = SnackbarHostState()
-        //searcchbar
-//    private val _searchBar= MutableLiveData("")
-//    val searchBar: LiveData<String> = _searchBar
-//
-//    fun setSearchText(text: String) {
-//        _searchBar.value = text
-//    }
+    //expanded menu
+    private val _expanded= MutableLiveData<Boolean>(true)
+    val expanded= _expanded
+
+    //imatge
+    var selectedImageUri = mutableStateOf<Uri?>(null)
+        private set
+
+    // El estado del snackbar
+    val snackbarHostState = SnackbarHostState()
+
+    //searcchbar
+    private val _searchBar= MutableLiveData("")
+    val searchBar: LiveData<String> = _searchBar
+
+    //tipos de mapa
+    private val _tipusMapa= MutableLiveData<String>()
+    val tipusMapa= _tipusMapa
+
+    private val _selectedItem = MutableLiveData<Int>(0)
+    val selectedItem= _selectedItem
 
     /*========SETTERS========*/
 
+    fun setSelectedItem(n: Int) {
+        _selectedItem.value= n
+    }
+
     fun setName(name: String) {
         _namePlace.value = name
+    }
+
+    fun setSearchText(text: String) {
+        _searchBar.value = text
+    }
+
+    fun setExpanded(expanded: Boolean) {
+        _expanded.value = expanded
     }
 
     //fem un c
@@ -84,6 +104,9 @@ class ViewModelApp : ViewModel() {
         _description.value = novaDescription
     }
 
+    fun setMapa(mapa: String) {
+        _tipusMapa.value = mapa
+    }
 //    fun updateSelectedImageUri(uri: Uri?) {
 //        selectedImageUri.value = uri
 //    }
@@ -163,7 +186,6 @@ class ViewModelApp : ViewModel() {
         }
     }
 
-
     //eliminar un marker
     fun deleteMarker(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -186,27 +208,27 @@ class ViewModelApp : ViewModel() {
     }
 
     //funció per fer una searchBar i buscar ubicació
-//    suspend fun geocodeLocation(locationName: String, apiKey: String): LatLng? {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val url = "https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${apiKey}"
-//                val client = OkHttpClient()
-//                val request = Request.Builder().url(url).build()
-//                val response = client.newCall(request).execute()
-//                val json = JSONObject(response.body?.string() ?: return@withContext null)
-//                val location = json.getJSONArray("results")
-//                    ?.optJSONObject(0)
-//                    ?.getJSONObject("geometry")
-//                    ?.getJSONObject("location")
-//                if (location != null) {
-//                    LatLng(location.getDouble("lat"), location.getDouble("lng"))
-//                } else null
-//            } catch (e: Exception) {
-//                Log.e("Geocode", "Error: ${e.message}")
-//                null
-//            }
-//        }
-//    }
+    suspend fun geocodeLocation(locationName: String, apiKey: String): LatLng? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = "https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${apiKey}"
+                val client = OkHttpClient()
+                val request = Request.Builder().url(url).build()
+                val response = client.newCall(request).execute()
+                val json = JSONObject(response.body?.string() ?: return@withContext null)
+                val location = json.getJSONArray("results")
+                    ?.optJSONObject(0)
+                    ?.getJSONObject("geometry")
+                    ?.getJSONObject("location")
+                if (location != null) {
+                    LatLng(location.getDouble("lat"), location.getDouble("lng"))
+                } else null
+            } catch (e: Exception) {
+                Log.e("Geocode", "Error: ${e.message}")
+                null
+            }
+        }
+    }
 
 
 

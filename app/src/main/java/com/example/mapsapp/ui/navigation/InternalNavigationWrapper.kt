@@ -11,26 +11,26 @@ import com.example.mapsapp.ui.screens.ListMarkers
 import com.example.mapsapp.ui.screens.MapsScreen
 import com.example.mapsapp.ui.screens.MarkerScreen
 import com.example.mapsapp.viewmodels.ViewModelApp
+import com.google.maps.android.compose.MapProperties
 import org.slf4j.Marker
 
 @Composable
 fun InternalNavigation(
     navController: NavHostController,
-    padding: Modifier,
     viewModelApp: ViewModelApp,
-    modifier: Modifier,
 ) {
     NavHost(navController, Destination.Map) {
-        //mapa
+        //mapa -> edit marker
+
         composable<Destination.Map> {
-            MapsScreen(modifier, { id ->
+            MapsScreen( { id ->
                 navController.navigate(Destination.MarkerDetail(id))
             }) { lat, long ->
                 navController.navigate(Destination.MarkerCreation(lat, long))
             }
         }
 
-        //listScreen marcadores
+        //crear marker ->
         composable<Destination.MarkerCreation> { backStackEntry ->
             val markerCreation = backStackEntry.toRoute<Destination.MarkerCreation>()
             MarkerScreen(
@@ -50,12 +50,9 @@ fun InternalNavigation(
         }
 
         composable<Destination.MarkerDetail> { id ->
-
             val detail = id.toRoute<Destination.MarkerDetail>()
             MarkerDetail(detail.id) {
-                navController.navigate(Destination.List) {
-                    popUpTo<Destination.List> { inclusive = true }
-                }
+                navController.popBackStack()
             }
         }
     }

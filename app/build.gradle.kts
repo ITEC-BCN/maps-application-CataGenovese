@@ -76,7 +76,6 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("io.github.jan-tennert.supabase:storage-kt:1.3.1") // usa la última versión
     implementation("io.coil-kt:coil-compose:2.1.0")
-
 }
 
 secrets {
