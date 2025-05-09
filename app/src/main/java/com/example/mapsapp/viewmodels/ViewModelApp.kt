@@ -25,7 +25,7 @@ class ViewModelApp : ViewModel() {
 
     //img
     private val _bitmap = MutableLiveData<Bitmap>(null)
-    val bitmap= _bitmap
+    val bitmap = _bitmap
 
     //nom del lloc on farem la foto
     private val _namePlace = MutableLiveData<String>()
@@ -51,8 +51,8 @@ class ViewModelApp : ViewModel() {
     val missatgeAvis = _missatgeAvis
 
     //expanded menu
-    private val _expanded= MutableLiveData<Boolean>(false)
-    val expanded= _expanded
+    private val _expanded = MutableLiveData<Boolean>(false)
+    val expanded = _expanded
 
     //imatge
     var selectedImageUri = mutableStateOf<Uri?>(null)
@@ -62,24 +62,24 @@ class ViewModelApp : ViewModel() {
     val snackbarHostState = SnackbarHostState()
 
     //searcchbar
-    private val _searchBar= MutableLiveData("")
+    private val _searchBar = MutableLiveData("")
     val searchBar: LiveData<String> = _searchBar
 
     //tipos de mapa
-    private val _tipusMapa= MutableLiveData<String>()
-    val tipusMapa= _tipusMapa
+    private val _tipusMapa = MutableLiveData<String>()
+    val tipusMapa = _tipusMapa
 
     private val _selectedItem = MutableLiveData<Int>(0)
-    val selectedItem= _selectedItem
+    val selectedItem = _selectedItem
 
     /*========SETTERS========*/
 
     fun setBitmap(bitmap: Bitmap) {
-        _bitmap.value= bitmap
+        _bitmap.value = bitmap
     }
 
     fun setSelectedItem(n: Int) {
-        _selectedItem.value= n
+        _selectedItem.value = n
     }
 
     fun setName(name: String) {
@@ -160,7 +160,7 @@ class ViewModelApp : ViewModel() {
         long: Double,
         foto: Bitmap?
     ) {
-        Log.d("cata", "foto null: ${foto==null}")
+        Log.d("cata", "foto null: ${foto == null}")
 
         Log.d("cata", "foto byte Count ${foto!!.byteCount}")
         Log.d("cata", "create marker a l c:")
@@ -172,7 +172,7 @@ class ViewModelApp : ViewModel() {
             val imageName = database.uploadImage(stream.toByteArray())
             Log.d("cata", " surto i mha retornat el $imageName")
             val newMarker = Marker(
-                name= name,
+                name = name,
                 description = description,
                 foto = imageName,
                 lat = lat,
@@ -185,23 +185,68 @@ class ViewModelApp : ViewModel() {
         }
     }
 
-//    //actualitzar un marker
-//    fun updateMarker(
-//        id: Int,
-//        name: String,
-//        description: String,
-//        lat: Double,
-//        long: Double,
-//        foto: Bitmap
-//    ) {
-//        val stream = ByteArrayOutputStream()
-//        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
-//        val imageName = _selectedStudent.value?.image?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
-//        CoroutineScope(Dispatchers.IO).launch {
-//            database.updateStudent(id, name, mark.toDouble(), imageName.toString(), stream.toByteArray())
-//        }
-//    }
+    fun updateMarkerInfo(name: String, description: String) {
+        val currentMarker = _actualMarker.value ?: return
+        val currentBitmap = _bitmap.value // Usamos el Bitmap que ya está en el ViewModel
 
+        if (currentBitmap == null) {
+            // Si no hay Bitmap, solo actualizamos nombre y descripción (sin tocar la imagen)
+            CoroutineScope(Dispatchers.IO).launch {
+                database.updateMarker(
+                    id = currentMarker.id,
+                    name = name,
+                    description = description,
+                    lat = currentMarker.lat,
+                    long = currentMarker.long,
+                    imageName = null,  // No actualizamos la imagen
+                    foto = null        // No actualizamos la imagen
+                )
+            }
+        } else {
+            // Si hay Bitmap, actualizamos todo (incluyendo la imagen)
+            val stream = ByteArrayOutputStream()
+            currentBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            val imageName = currentMarker.foto?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+
+            CoroutineScope(Dispatchers.IO).launch {
+                database.updateMarker(
+                    id = currentMarker.id,
+                    name = name,
+                    description = description,
+                    lat = currentMarker.lat,
+                    long = currentMarker.long,
+                    imageName = imageName.toString(),
+                    foto = stream.toByteArray()
+                )
+            }
+        }
+    }
+
+    //    //actualitzar un marker
+    fun updateMarker(
+        id: Int,
+        name: String,
+        description: String,
+        lat: Double,
+        long: Double,
+        foto: Bitmap?
+    ) {
+        val stream = ByteArrayOutputStream()
+        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
+        val imageName =
+            _actualMarker.value?.foto?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+        CoroutineScope(Dispatchers.IO).launch {
+            database.updateMarker(
+                id,
+                name,
+                description,
+                lat,
+                long,
+                imageName.toString(),
+                stream.toByteArray()
+            )
+        }
+    }
 
 
 //    //funció per fer una searchBar i buscar ubicació
@@ -226,7 +271,6 @@ class ViewModelApp : ViewModel() {
 //            }
 //        }
 //    }
-
 
 
 }

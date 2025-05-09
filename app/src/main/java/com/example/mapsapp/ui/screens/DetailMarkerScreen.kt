@@ -159,10 +159,11 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                                     }
                                 )
                             } else {
-//                                vM.updateMarker(
-//                                    id, markerName, markerDescription,
-//                                    actualMarker!!.lat, actualMarker!!.long, actualMarker!!.foto
-//                                )
+                                vM.updateMarkerInfo(
+                                    markerName,
+                                    markerDescription
+                                )
+
                             }
                         },
                         shape = RoundedCornerShape(10.dp),

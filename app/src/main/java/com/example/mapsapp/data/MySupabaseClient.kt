@@ -64,6 +64,14 @@ class MySupabaseClient {
 
     fun buildImageUrl(imageFileName: String) = "${this.supabaseUrl}/storage/v1/object/public/images/${imageFileName}"
 
+    suspend fun updateMarkerInfo(id: Int, name: String, description: String) {
+        client.from("Marker").update({
+            set("name", name)
+            set("description", description)
+        }) {
+            filter { eq("id", id) }
+        }
+    }
 
     suspend fun updateMarker(
         id: Int,
@@ -71,20 +79,23 @@ class MySupabaseClient {
         description: String,
         lat: Double,
         long: Double,
-        imageName: String,
-        foto: ByteArray,
+        imageName: String? = null,  // Hacer opcional
+        foto: ByteArray? = null     // Hacer opcional
     ) {
-        val imageName = storage.from("images").update(path = imageName, data = foto)
+        if (imageName != null && foto != null) {
+            storage.from("images").update(path = imageName, data = foto)
+        }
+
         client.from("Map").update({
             set("name", name)
             set("description", description)
             set("lat", lat)
             set("long", long)
-            set("foto", buildImageUrl(imageFileName = imageName.path))
-        }) {
-            filter {
-                eq("id", id)
+            if (imageName != null) {
+                set("foto", buildImageUrl(imageFileName = imageName))
             }
+        }) {
+            filter { eq("id", id) }
         }
     }
 

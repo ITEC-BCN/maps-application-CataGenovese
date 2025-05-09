@@ -113,6 +113,7 @@ fun MarkerScreen(
                         }
                     )
                 } else {
+                    viewModelApp.setAvisCreate("Creado")
                     viewModelApp.createNewMarker(
                         name,
                         description,
