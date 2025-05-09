@@ -4,8 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,8 +41,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.io.File
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MarkerScreen(
     lat: Double,
@@ -53,6 +57,9 @@ fun MarkerScreen(
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage by viewModelApp.missatgeAvis.observeAsState()
+    val bitmap by viewModelApp.bitmap.observeAsState()
+
+
 
     // Show Snackbar when there's an error message
     LaunchedEffect(errorMessage) {
@@ -90,7 +97,7 @@ fun MarkerScreen(
         )
 
         // Camera Component
-        CameraScreen(onImageCaptured = { uri ->
+        CameraScreen(viewModelApp, onImageCaptured = { uri ->
             selectedImageUri = uri
         })
 
@@ -106,12 +113,12 @@ fun MarkerScreen(
                         }
                     )
                 } else {
-                    viewModelApp.insertNewMarker(
+                    viewModelApp.createNewMarker(
                         name,
                         description,
                         lat,
                         long,
-                        foto = selectedImageUri?.toString() ?: "No image"
+                        foto = bitmap
                     )
                 }
             },
@@ -138,17 +145,18 @@ fun MarkerScreen(
 
 
 @Composable
-fun CameraScreen(onImageCaptured: (Uri) -> Unit) {
+fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
     val context = LocalContext.current
     val imageUri = remember { mutableStateOf<Uri?>(null) }
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val bitmap by viewModelApp.bitmap.observeAsState(null)
 
     val takePictureLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && imageUri.value != null) {
                 onImageCaptured(imageUri.value!!)
                 val stream = context.contentResolver.openInputStream(imageUri.value!!)
-                bitmap.value = BitmapFactory.decodeStream(stream)
+                //guardem imatge
+                viewModelApp.setBitmap(BitmapFactory.decodeStream(stream))
             }
         }
     val pickImageLauncher =
@@ -157,7 +165,7 @@ fun CameraScreen(onImageCaptured: (Uri) -> Unit) {
                 imageUri.value = it
                 onImageCaptured(it)
                 val stream = context.contentResolver.openInputStream(it)
-                bitmap.value = BitmapFactory.decodeStream(stream)
+                viewModelApp.setBitmap(BitmapFactory.decodeStream(stream))
             }
         }
 
@@ -200,11 +208,9 @@ fun CameraScreen(onImageCaptured: (Uri) -> Unit) {
         Button(onClick = { showDialog = true }) {
             Text("Abrir Cámara o Galería")
         }
-
-
-        bitmap.value?.let {
+        if (bitmap != null) {
             Image(
-                bitmap = it.asImageBitmap(),
+                bitmap = bitmap!!.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
                     .size(300.dp)
@@ -214,6 +220,7 @@ fun CameraScreen(onImageCaptured: (Uri) -> Unit) {
         }
     }
 }
+
 
 fun createImageUri(context: Context): Uri? {
     val file = File.createTempFile("temp_image_", ".jpg", context.cacheDir).apply {

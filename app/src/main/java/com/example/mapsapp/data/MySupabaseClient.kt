@@ -1,67 +1,46 @@
-package com.example.mapsapp.ui.navigation
+package com.example.mapsapp.data
 
-import android.content.Context
-import android.net.Uri
-import com.example.mapsapp.data.Marker_bdd
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import com.example.mapsapp.BuildConfig
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.storage
-import io.github.jan.supabase.storage.upload
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-
-class MySupabaseClient() {
+class MySupabaseClient {
     lateinit var client: SupabaseClient
-
-    constructor(supabaseUrl: String, supabaseKey: String) : this() {
-        client = createSupabaseClient(
-            supabaseUrl = supabaseUrl,
-            supabaseKey = supabaseKey
-        ) {
+    lateinit var storage: Storage
+    private val supabaseUrl = BuildConfig.SUPABASE_URL
+    private val supabaseKey = BuildConfig.SUPABASE_KEY
+    constructor() {
+        client = createSupabaseClient(supabaseUrl = supabaseUrl, supabaseKey = supabaseKey) {
             install(Postgrest)
             install(Storage)
-
         }
+        storage = client.storage
     }
 
     //SQL operations
-    suspend fun getAllMarkers(): List<Marker_bdd> {
-        return client.from("Map").select().decodeList<Marker_bdd>()
+    suspend fun getAllMarkers(): List<Marker> {
+        return client.from("Map").select().decodeList<Marker>()
     }
 
-    suspend fun getMarker(id: Int): Marker_bdd {
+    suspend fun getMarker(id: Int): Marker {
         return client.from("Map").select {
             filter {
                 eq("id", id)
             }
-        }.decodeSingle<Marker_bdd>()
+        }.decodeSingle<Marker>()
     }
 
-    suspend fun insertMarker(marker: Marker_bdd) {
+    suspend fun insertMarker(marker: Marker) {
         client.from("Map").insert(marker)
-    }
-
-    suspend fun updateMarker(
-        id: Int,
-        name: String,
-        description: String,
-        lat: Double,
-        long: Double,
-        foto: String,
-    ) {
-        client.from("Map").update({
-            set("name", name)
-            set("description", description)
-            set("lat", lat)
-            set("long", long)
-            set("foto", foto)
-        }) {
-            filter {
-                eq("id", id)
-            }
-        }
     }
 
     suspend fun deleteMarker(id: String) {
@@ -71,4 +50,46 @@ class MySupabaseClient() {
             }
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun uploadImage(imageFile: ByteArray): String {
+        val fechaHoraActual = LocalDateTime.now()
+        val formato = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+        val imageName = storage.from("images").upload(path = "image_${fechaHoraActual.format(formato)}.png", data = imageFile)
+        Log.d("cata", "imageName: $imageName")
+        Log.d("cata", "buildImageURL: ${buildImageUrl(imageFileName = imageName.path)}")
+        return buildImageUrl(imageFileName = imageName.path)
+
+    }
+
+    fun buildImageUrl(imageFileName: String) = "${this.supabaseUrl}/storage/v1/object/public/images/${imageFileName}"
+
+
+    suspend fun updateMarker(
+        id: Int,
+        name: String,
+        description: String,
+        lat: Double,
+        long: Double,
+        imageName: String,
+        foto: ByteArray,
+    ) {
+        val imageName = storage.from("images").update(path = imageName, data = foto)
+        client.from("Map").update({
+            set("name", name)
+            set("description", description)
+            set("lat", lat)
+            set("long", long)
+            set("foto", buildImageUrl(imageFileName = imageName.path))
+        }) {
+            filter {
+                eq("id", id)
+            }
+        }
+    }
+
+
+
+
 }
+

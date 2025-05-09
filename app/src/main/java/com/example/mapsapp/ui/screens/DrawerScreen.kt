@@ -89,10 +89,10 @@ fun DrawerScreen(viewModelApp: ViewModelApp) {
                 )
             }
         ) { innerPadding ->
+            //aixo ho faig perque el mapa ocupi tota la pantalla
             val modifier = Modifier.padding(innerPadding)
             modifier.padding(bottom = 0.dp)
             Column() {
-
                 InternalNavigation(navController, viewModelApp)
             }
         }

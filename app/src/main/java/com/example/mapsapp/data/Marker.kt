@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Marker_bdd(
+data class Marker(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,

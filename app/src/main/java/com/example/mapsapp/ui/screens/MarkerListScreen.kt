@@ -23,11 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mapsapp.data.Marker_bdd
+import com.example.mapsapp.data.Marker
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextAlign
 import com.example.mapsapp.viewmodels.ViewModelApp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -43,7 +44,7 @@ import com.example.mapsapp.R
 @Composable
 fun ListMarkers(navigateToDetail: (Int) -> Unit) {
     val vM = viewModel<ViewModelApp>()
-    val markerList by vM.markerList.observeAsState(emptyList<Marker_bdd>())
+    val markerList by vM.markerList.observeAsState(emptyList<Marker>())
     vM.getAllMarkers()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -72,7 +73,7 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
             {
-                items(markerList) { marker ->
+                itemsIndexed(markerList, key = {_, marker -> marker.id }) { _, marker ->
                     val dissmissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = {
                             if (it == SwipeToDismissBoxValue.EndToStart) {
@@ -93,7 +94,9 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete"
+                                contentDescription = "Delete",
+                                tint = Color.White,
+                                modifier= Modifier.padding(bottom = 15.dp)
                             )
                         }
                     }) {
@@ -109,7 +112,7 @@ fun ListMarkers(navigateToDetail: (Int) -> Unit) {
 
 
 @Composable
-fun MarkerItem(marker: Marker_bdd, navigateToDetail: (Int) -> Unit) {
+fun MarkerItem(marker: Marker, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -1,27 +1,31 @@
 package com.example.mapsapp.viewmodels
 
+import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mapsapp.MyApp
-import com.example.mapsapp.data.Marker_bdd
-import com.google.android.gms.maps.model.LatLng
+import com.example.mapsapp.data.Marker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 
 class ViewModelApp : ViewModel() {
 
     val database = MyApp.database
+
+    //img
+    private val _bitmap = MutableLiveData<Bitmap>(null)
+    val bitmap= _bitmap
 
     //nom del lloc on farem la foto
     private val _namePlace = MutableLiveData<String>()
@@ -36,11 +40,11 @@ class ViewModelApp : ViewModel() {
     val img = _img
 
     //markerActual
-    private var _actualMarker = MutableLiveData<Marker_bdd>()
+    private var _actualMarker = MutableLiveData<Marker>()
     val actualMarker = _actualMarker
 
     //lista marcadores
-    private val _markersList = MutableLiveData<List<Marker_bdd>>()
+    private val _markersList = MutableLiveData<List<Marker>>()
     val markerList = _markersList
 
     private val _missatgeAvis = MutableLiveData<String?>()
@@ -69,6 +73,10 @@ class ViewModelApp : ViewModel() {
     val selectedItem= _selectedItem
 
     /*========SETTERS========*/
+
+    fun setBitmap(bitmap: Bitmap) {
+        _bitmap.value= bitmap
+    }
 
     fun setSelectedItem(n: Int) {
         _selectedItem.value= n
@@ -123,65 +131,14 @@ class ViewModelApp : ViewModel() {
         }
     }
 
-    //crear un marker
-    fun insertNewMarker(
-        name: String,
-        description: String,
-        lat: Double,
-        long: Double,
-        foto: String
-    ) {
-        // condicio per verificar si el nom o la descripcio estna buits
-        if (name.isBlank() || description.isBlank()) {
-            val missatge = when {
-                name.isBlank() && description.isBlank() -> "⚠\uFE0F Name and description required!"
-                name.isBlank() -> "⚠\uFE0F Please enter a name!"
-                else -> "⚠\uFE0F Please enter a description!"
-            }
-            //mostrem missatge
-            _missatgeAvis.value = missatge
-        } else {
-            //si tenim nom i descripció creem el marker amb les dades uqe ha insertat l'usuari
-            val newMarker = Marker_bdd(
-                id = 0,
-                name = name,
-                description = description,
-                lat = lat,
-                long = long,
-                foto = foto
-            )
-
-            CoroutineScope(Dispatchers.IO).launch {
-                database.insertMarker(newMarker)
-                getAllMarkers()
-            }
-        }
-    }
-
-    //actualitzar un marker
-    fun updateMarker(
-        id: Int,
-        name: String,
-        description: String,
-        lat: Double,
-        long: Double,
-        foto: String
-    ) {
-        Log.d(
-            "UPDATE",
-            "Called with id=$id, name=$name, description=$description, lat=$lat, long=$long, foto=$foto"
-        )
-        if (name.isBlank() || description.isBlank()) {
-            val missatge = when {
-                name.isBlank() && description.isBlank() -> "⚠\uFE0F Name and description required!"
-                name.isBlank() -> "⚠\uFE0F Please enter a name!"
-                else -> "⚠\uFE0F Please enter a description!"
-            }
-            _missatgeAvis.postValue(missatge) // Properly update error message
-        } else {
-            CoroutineScope(Dispatchers.IO).launch {
-                database.updateMarker(id, name, description, lat, long, foto)
-                getAllMarkers()
+    //get marker id
+    fun getMarker(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val marker = database.getMarker(id)
+            withContext(Dispatchers.Main) {
+                _actualMarker.value = marker
+                _namePlace.value = marker.name
+                _description.value = marker.description
             }
         }
     }
@@ -194,41 +151,81 @@ class ViewModelApp : ViewModel() {
         }
     }
 
-    //obtenir nomes un marker
-    fun getMarker(id: Int) {
+    //crear un marker
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun createNewMarker(
+        name: String,
+        description: String,
+        lat: Double,
+        long: Double,
+        foto: Bitmap?
+    ) {
+        Log.d("cata", "foto null: ${foto==null}")
+
+        Log.d("cata", "foto byte Count ${foto!!.byteCount}")
+        Log.d("cata", "create marker a l c:")
+        val stream = ByteArrayOutputStream()
+        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
+        Log.d("cata", "entra a l c:")
         CoroutineScope(Dispatchers.IO).launch {
-            val marker = database.getMarker(id)
-            withContext(Dispatchers.Main) {
-                _actualMarker.value = marker
-                _namePlace.value = marker.name
-                _description.value = marker.description
-            }
-        }
+            Log.d("cata", " crido a uploadImage")
+            val imageName = database.uploadImage(stream.toByteArray())
+            Log.d("cata", " surto i mha retornat el $imageName")
+            val newMarker = Marker(
+                name= name,
+                description = description,
+                foto = imageName,
+                lat = lat,
+                long = long
+            )
+            Log.d("cata", " sha creat")
+            database.insertMarker(newMarker)
+            Log.d("cata", " Sortida insertMarker")
 
-    }
-
-    //funció per fer una searchBar i buscar ubicació
-    suspend fun geocodeLocation(locationName: String, apiKey: String): LatLng? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val url = "https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${apiKey}"
-                val client = OkHttpClient()
-                val request = Request.Builder().url(url).build()
-                val response = client.newCall(request).execute()
-                val json = JSONObject(response.body?.string() ?: return@withContext null)
-                val location = json.getJSONArray("results")
-                    ?.optJSONObject(0)
-                    ?.getJSONObject("geometry")
-                    ?.getJSONObject("location")
-                if (location != null) {
-                    LatLng(location.getDouble("lat"), location.getDouble("lng"))
-                } else null
-            } catch (e: Exception) {
-                Log.e("Geocode", "Error: ${e.message}")
-                null
-            }
         }
     }
+
+//    //actualitzar un marker
+//    fun updateMarker(
+//        id: Int,
+//        name: String,
+//        description: String,
+//        lat: Double,
+//        long: Double,
+//        foto: Bitmap
+//    ) {
+//        val stream = ByteArrayOutputStream()
+//        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
+//        val imageName = _selectedStudent.value?.image?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+//        CoroutineScope(Dispatchers.IO).launch {
+//            database.updateStudent(id, name, mark.toDouble(), imageName.toString(), stream.toByteArray())
+//        }
+//    }
+
+
+
+//    //funció per fer una searchBar i buscar ubicació
+//    suspend fun geocodeLocation(locationName: String, apiKey: String): LatLng? {
+//        return withContext(Dispatchers.IO) {
+//            try {
+//                val url = "https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${apiKey}"
+//                val client = OkHttpClient()
+//                val request = Request.Builder().url(url).build()
+//                val response = client.newCall(request).execute()
+//                val json = JSONObject(response.body?.string() ?: return@withContext null)
+//                val location = json.getJSONArray("results")
+//                    ?.optJSONObject(0)
+//                    ?.getJSONObject("geometry")
+//                    ?.getJSONObject("location")
+//                if (location != null) {
+//                    LatLng(location.getDouble("lat"), location.getDouble("lng"))
+//                } else null
+//            } catch (e: Exception) {
+//                Log.e("Geocode", "Error: ${e.message}")
+//                null
+//            }
+//        }
+//    }
 
 
 

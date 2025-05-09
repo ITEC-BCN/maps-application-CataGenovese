@@ -3,12 +3,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -96,57 +98,95 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                 )
 
                 actualMarker?.foto?.let { fotoUrl ->
-                    AsyncImage(
-                        model = fotoUrl,
-                        contentDescription = "Marker image",
+                    Row(
                         modifier = Modifier
-                            .padding(top = 24.dp)
-                            .size(220.dp)
-                            .background(Color(0xFFEFE9E1), RoundedCornerShape(16.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = fotoUrl,
+                            contentDescription = "Marker image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(160.dp)
+                                .background(Color(0xFFEFE9E1), RoundedCornerShape(16.dp))
+                        )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
 
-                Button(
-                    onClick = {
-                        if (markerName.isBlank() || markerDescription.isBlank()) {
-                            vM.setAvisCreate(
-                                when {
-                                    markerName.isBlank() && markerDescription.isBlank() -> "⚠️ Name and description required!"
-                                    markerName.isBlank() -> "⚠️ Please enter a name!"
-                                    else -> "⚠️ Please enter a description!"
-                                }
-                            )
-                        } else {
-                            vM.updateMarker(
-                                id, markerName, markerDescription,
-                                actualMarker!!.lat, actualMarker!!.long, actualMarker!!.foto
-                            )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Button(
+                                onClick = { /* Acción cambiar foto */ },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFFD2B48C
+                                    )
+                                ),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.width(140.dp)
+                            ) {
+                                Text("Cambiar foto")
+                            }
+
+                            Button(
+                                onClick = { /* Acción eliminar foto */ },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFFD46A6A
+                                    )
+                                ),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.width(140.dp)
+                            ) {
+                                Text("Eliminar foto")
+                            }
                         }
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD2B48C)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                ) {
-                    Text("Update")
-                }
+                    }
 
-                Button(
-                    onClick = { navigateBack() },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFAF9B)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                ) {
-                    Text("Turn back")
+
+                    Button(
+                        onClick = {
+                            if (markerName.isBlank() || markerDescription.isBlank()) {
+                                vM.setAvisCreate(
+                                    when {
+                                        markerName.isBlank() && markerDescription.isBlank() -> "⚠️ Name and description required!"
+                                        markerName.isBlank() -> "⚠️ Please enter a name!"
+                                        else -> "⚠️ Please enter a description!"
+                                    }
+                                )
+                            } else {
+//                                vM.updateMarker(
+//                                    id, markerName, markerDescription,
+//                                    actualMarker!!.lat, actualMarker!!.long, actualMarker!!.foto
+//                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD2B48C)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text("Update")
+                    }
+
+
+                    Button(
+                        onClick = { navigateBack() },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFAF9B)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text("Turn back")
+                    }
                 }
             }
-
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
