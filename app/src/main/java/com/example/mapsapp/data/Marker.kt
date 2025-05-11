@@ -1,6 +1,5 @@
 package com.example.mapsapp.data
 
-import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
@@ -12,5 +11,5 @@ data class Marker(
     val description: String,
     val lat: Double,
     val long: Double,
-    val foto: String
+    val foto: String?
 )

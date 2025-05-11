@@ -113,17 +113,16 @@ fun MarkerScreen(
                         }
                     )
                 } else {
-                    viewModelApp.setAvisCreate("Creado")
                     viewModelApp.createNewMarker(
                         name,
                         description,
                         lat,
                         long,
-                        foto = bitmap
+                        foto = bitmap // Puede ser null
                     )
+                    viewModelApp.setAvisCreate("Marker creado")
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
+            }
         ) {
             Text("Create Marker")
         }

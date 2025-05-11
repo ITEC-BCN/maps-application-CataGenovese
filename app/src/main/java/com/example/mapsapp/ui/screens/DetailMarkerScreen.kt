@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 
-
 @Composable
 fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
     val vM = viewModel<ViewModelApp>()
@@ -61,7 +60,6 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         if (actualMarker != null) {
             Column(
                 modifier = Modifier
@@ -70,6 +68,7 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                //Edit Marker
                 Text(
                     text = "Edit Marker",
                     fontSize = 24.sp,
@@ -96,6 +95,7 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 )
+                // Sección de imagen (solo si existe)
 
                 actualMarker?.foto?.let { fotoUrl ->
                     Row(
@@ -120,7 +120,7 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Button(
-                                onClick = { /* Acción cambiar foto */ },
+                                onClick = { /* update button */ },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(
                                         0xFFD2B48C
@@ -133,11 +133,9 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                             }
 
                             Button(
-                                onClick = { /* Acción eliminar foto */ },
+                                onClick = { /* delete button */ },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFFD46A6A
-                                    )
+                                    containerColor = Color(0xFFBE0000)
                                 ),
                                 shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier.width(140.dp)
@@ -146,48 +144,49 @@ fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
                             }
                         }
                     }
+                }
 
 
-                    Button(
-                        onClick = {
-                            if (markerName.isBlank() || markerDescription.isBlank()) {
-                                vM.setAvisCreate(
-                                    when {
-                                        markerName.isBlank() && markerDescription.isBlank() -> "⚠️ Name and description required!"
-                                        markerName.isBlank() -> "⚠️ Please enter a name!"
-                                        else -> "⚠️ Please enter a description!"
-                                    }
-                                )
-                            } else {
-                                vM.updateMarkerInfo(
-                                    markerName,
-                                    markerDescription
-                                )
+                Button(
+                    onClick = {
+                        if (markerName.isBlank() || markerDescription.isBlank()) {
+                            vM.setAvisCreate(
+                                when {
+                                    markerName.isBlank() && markerDescription.isBlank() -> "⚠️ Name and description required!"
+                                    markerName.isBlank() -> "⚠️ Please enter a name!"
+                                    else -> "⚠️ Please enter a description!"
+                                }
+                            )
+                        } else {
+                            vM.updateMarkerInfo(
+                                markerName,
+                                markerDescription
+                            )
 
-                            }
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD2B48C)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text("Update")
-                    }
+                        }
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD2B48C)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text("Update")
+                }
 
 
-                    Button(
-                        onClick = { navigateBack() },
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFAF9B)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text("Turn back")
-                    }
+                Button(
+                    onClick = { navigateBack() },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFAF9B)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text("Turn back")
                 }
             }
+
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()

@@ -24,7 +24,7 @@ class ViewModelApp : ViewModel() {
     val database = MyApp.database
 
     //img
-    private val _bitmap = MutableLiveData<Bitmap>(null)
+    private val _bitmap = MutableLiveData<Bitmap?>(null)
     val bitmap = _bitmap
 
     //nom del lloc on farem la foto
@@ -160,31 +160,52 @@ class ViewModelApp : ViewModel() {
         long: Double,
         foto: Bitmap?
     ) {
-        Log.d("cata", "foto null: ${foto == null}")
-
-        Log.d("cata", "foto byte Count ${foto!!.byteCount}")
-        Log.d("cata", "create marker a l c:")
-        val stream = ByteArrayOutputStream()
-        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
-        Log.d("cata", "entra a l c:")
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d("cata", " crido a uploadImage")
-            val imageName = database.uploadImage(stream.toByteArray())
-            Log.d("cata", " surto i mha retornat el $imageName")
-            val newMarker = Marker(
-                name = name,
-                description = description,
-                foto = imageName,
-                lat = lat,
-                long = long
-            )
-            Log.d("cata", " sha creat")
-            database.insertMarker(newMarker)
-            Log.d("cata", " Sortida insertMarker")
+            try {
+                val imageUrl = if (foto != null) {
+                    val stream = ByteArrayOutputStream()
+                    foto.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    Log.d("MarkerCreation", "Uploading image")
+                    database.uploadImage(stream.toByteArray())
+                } else {
+                    null
+                }
 
+                val newMarker = Marker(
+                    name = name,
+                    description = description,
+                    foto = imageUrl,
+                    lat = lat,
+                    long = long
+                )
+
+                Log.d("MarkerCreation", "Creating marker: $newMarker")
+                database.insertMarker(newMarker)
+                Log.d("MarkerCreation", "Marker created successfully")
+
+                withContext(Dispatchers.Main) {
+                    // Limpiar los campos después de crear el marcador
+                    _namePlace.value = ""
+                    _description.value = ""
+                    _bitmap.value = null
+                    selectedImageUri.value = null
+
+                    _missatgeAvis.value = "Marker creado correctamente"
+                    delay(2000)
+                    _missatgeAvis.value = null
+                }
+            } catch (e: Exception) {
+                Log.e("MarkerCreation", "Error creating marker", e)
+                withContext(Dispatchers.Main) {
+                    _missatgeAvis.value = "Error al crear marker: ${e.message}"
+                    delay(2000)
+                    _missatgeAvis.value = null
+                }
+            }
         }
     }
 
+    //funcio per actualitzar el marker
     fun updateMarkerInfo(name: String, description: String) {
         val currentMarker = _actualMarker.value ?: return
         val currentBitmap = _bitmap.value // Usamos el Bitmap que ya está en el ViewModel
@@ -223,30 +244,53 @@ class ViewModelApp : ViewModel() {
     }
 
     //    //actualitzar un marker
-    fun updateMarker(
-        id: Int,
-        name: String,
-        description: String,
-        lat: Double,
-        long: Double,
-        foto: Bitmap?
-    ) {
-        val stream = ByteArrayOutputStream()
-        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
-        val imageName =
-            _actualMarker.value?.foto?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
-        CoroutineScope(Dispatchers.IO).launch {
-            database.updateMarker(
-                id,
-                name,
-                description,
-                lat,
-                long,
-                imageName.toString(),
-                stream.toByteArray()
-            )
-        }
-    }
+//    fun updateMarker(
+//        id: Int,
+//        name: String,
+//        description: String,
+//        lat: Double,
+//        long: Double,
+//        foto: Bitmap?
+//    ) {
+//        val stream = ByteArrayOutputStream()
+//        foto?.compress(Bitmap.CompressFormat.PNG, 0, stream)
+//        val imageName =
+//            _actualMarker.value?.foto?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+//        CoroutineScope(Dispatchers.IO).launch {
+//            database.updateMarker(
+//                id,
+//                name,
+//                description,
+//                lat,
+//                long,
+//                imageName.toString(),
+//                stream.toByteArray()
+//            )
+//        }
+//    }
+
+//    fun deleteImage(id: Int, imageUrl: String) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                database.clearMarkerImage(id, imageUrl)
+//                withContext(Dispatchers.Main) {
+//                    // Actualizar el estado
+//                    _actualMarker.value = _actualMarker.value?.copy(foto = null)
+//                    _bitmap.value = null
+//                    _missatgeAvis.value = "Imagen eliminada correctamente"
+//                    delay(2000)
+//                    _missatgeAvis.value = null
+//                }
+//            } catch (e: Exception) {
+//                withContext(Dispatchers.Main) {
+//                    _missatgeAvis.value = "Error al eliminar imagen: ${e.message}"
+//                    delay(2000)
+//                    _missatgeAvis.value = null
+//                }
+//            }
+//        }
+//    }
+
 
 
 //    //funció per fer una searchBar i buscar ubicació

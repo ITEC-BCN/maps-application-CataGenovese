@@ -18,6 +18,7 @@ class MySupabaseClient {
     lateinit var storage: Storage
     private val supabaseUrl = BuildConfig.SUPABASE_URL
     private val supabaseKey = BuildConfig.SUPABASE_KEY
+
     constructor() {
         client = createSupabaseClient(supabaseUrl = supabaseUrl, supabaseKey = supabaseKey) {
             install(Postgrest)
@@ -51,27 +52,52 @@ class MySupabaseClient {
         }
     }
 
+//    // Función mejorada para eliminar marcador con imagen
+//    suspend fun deleteMarkerWithImage(id: String, imageUrl: String?) {
+//        // Eliminar imagen primero si existe
+//        imageUrl?.let { deleteImage(it) }
+//
+//        // Luego eliminar el marcador
+//        deleteMarker(id)
+//    }
+//
+//    // Función para eliminar solo la imagen del marcador (versión alternativa)
+//    suspend fun clearMarkerImage(id: Int, imageUrl: String) {
+//        deleteImage(imageUrl)
+//
+//        // Usando el enfoque de mapa en lugar de set()
+//        client.from("Map").update(
+//            mapOf("foto" to null)
+//        ) {
+//            filter { eq("id", id) }
+//        }
+//    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun uploadImage(imageFile: ByteArray): String {
         val fechaHoraActual = LocalDateTime.now()
         val formato = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
-        val imageName = storage.from("images").upload(path = "image_${fechaHoraActual.format(formato)}.png", data = imageFile)
+        val imageName = storage.from("images")
+            .upload(path = "image_${fechaHoraActual.format(formato)}.png", data = imageFile)
         Log.d("cata", "imageName: $imageName")
         Log.d("cata", "buildImageURL: ${buildImageUrl(imageFileName = imageName.path)}")
         return buildImageUrl(imageFileName = imageName.path)
 
     }
 
-    fun buildImageUrl(imageFileName: String) = "${this.supabaseUrl}/storage/v1/object/public/images/${imageFileName}"
+    fun buildImageUrl(imageFileName: String) =
+        "${this.supabaseUrl}/storage/v1/object/public/images/${imageFileName}"
 
-    suspend fun updateMarkerInfo(id: Int, name: String, description: String) {
-        client.from("Marker").update({
-            set("name", name)
-            set("description", description)
-        }) {
-            filter { eq("id", id) }
-        }
-    }
+
+//    suspend fun updateMarkerInfo(id: Int, name: String, description: String) {
+//        client.from("Marker").update({
+//            set("name", name)
+//            set("description", description)
+//        }) {
+//            filter { eq("id", id) }
+//        }
+//    }
 
     suspend fun updateMarker(
         id: Int,
@@ -98,9 +124,5 @@ class MySupabaseClient {
             filter { eq("id", id) }
         }
     }
-
-
-
-
 }
 
