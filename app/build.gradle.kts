@@ -105,6 +105,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.1.4")
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
+    implementation("io.ktor:ktor-client-android:3.1.2")
 
 }
 

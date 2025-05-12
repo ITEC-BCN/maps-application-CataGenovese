@@ -10,8 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mapsapp.MyApp
+import com.example.mapsapp.SupabaseApplication
 import com.example.mapsapp.data.Marker
+import com.example.mapsapp.utils.AuthState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
-class ViewModelApp : ViewModel() {
+class ViewModelApp() : ViewModel() {
 
     val database = MyApp.database
 
@@ -72,6 +75,24 @@ class ViewModelApp : ViewModel() {
     private val _selectedItem = MutableLiveData<Int>(0)
     val selectedItem = _selectedItem
 
+    private val authManager = SupabaseApplication.supabase
+
+    private val _email = MutableLiveData<String>()
+    val email = _email
+
+    private val _password = MutableLiveData<String>()
+    val password = _password
+
+    private val _authState = MutableLiveData<AuthState>()
+    val authState = _authState
+
+    private val _showError = MutableLiveData<Boolean>(false)
+    val showError = _showError
+
+    private val _user = MutableLiveData<String?>()
+    val user = _user
+
+
     /*========SETTERS========*/
 
     fun setBitmap(bitmap: Bitmap) {
@@ -94,7 +115,6 @@ class ViewModelApp : ViewModel() {
         _expanded.value = expanded
     }
 
-    //fem un c
     fun setAvis() {
         _missatgeAvis.value = null
     }
@@ -206,6 +226,7 @@ class ViewModelApp : ViewModel() {
     }
 
     //funcio per actualitzar el marker
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateMarkerInfo(name: String, description: String) {
         val currentMarker = _actualMarker.value ?: return
         val currentBitmap = _bitmap.value // Usamos el Bitmap que ya está en el ViewModel
@@ -217,31 +238,46 @@ class ViewModelApp : ViewModel() {
                     id = currentMarker.id,
                     name = name,
                     description = description,
-                    lat = currentMarker.lat,
-                    long = currentMarker.long,
-                    imageName = null,  // No actualizamos la imagen
-                    foto = null        // No actualizamos la imagen
+                    //no actualitzem img
+                    imageName = null,
+                    imgFile = null
                 )
             }
         } else {
-            // Si hay Bitmap, actualizamos todo (incluyendo la imagen)
+            // Si hay Bitmap, actualizamos img tambe
             val stream = ByteArrayOutputStream()
             currentBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val imageName = currentMarker.foto?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+            val imageName = currentMarker.foto?.removePrefix("https://ysenmbkminqdldmhphzf.supabase.co/storage/v1/object/public/images/")
 
             CoroutineScope(Dispatchers.IO).launch {
                 database.updateMarker(
                     id = currentMarker.id,
                     name = name,
                     description = description,
-                    lat = currentMarker.lat,
-                    long = currentMarker.long,
                     imageName = imageName.toString(),
-                    foto = stream.toByteArray()
+                    imgFile = stream.toByteArray()
                 )
             }
         }
     }
+
+
+    //funció per veure si hi ha dades d’usuari a SharedPreferences:
+//    private fun checkExistingSession() {
+//        viewModelScope.launch {
+//            val accessToken = sharedPre.getAccessToken()
+//            val refreshToken = sharedPreferences.getRefreshToken()
+//            when {
+//                !accessToken.isNullOrEmpty() -> refreshToken()
+//                !refreshToken.isNullOrEmpty() -> refreshToken()
+//                else -> _authState.value = AuthState.Unauthenticated
+//            }
+//        }
+//    }
+
+
+
+
 
     //    //actualitzar un marker
 //    fun updateMarker(
@@ -290,9 +326,6 @@ class ViewModelApp : ViewModel() {
 //            }
 //        }
 //    }
-
-
-
 //    //funció per fer una searchBar i buscar ubicació
 //    suspend fun geocodeLocation(locationName: String, apiKey: String): LatLng? {
 //        return withContext(Dispatchers.IO) {
@@ -315,7 +348,6 @@ class ViewModelApp : ViewModel() {
 //            }
 //        }
 //    }
-
 
 }
 

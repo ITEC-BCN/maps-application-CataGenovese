@@ -55,6 +55,7 @@ fun MarkerScreen(
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState("")
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage by viewModelApp.missatgeAvis.observeAsState()
     val bitmap by viewModelApp.bitmap.observeAsState()

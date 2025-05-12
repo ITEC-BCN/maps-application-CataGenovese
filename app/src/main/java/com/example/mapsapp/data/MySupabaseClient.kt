@@ -99,30 +99,75 @@ class MySupabaseClient {
 //        }
 //    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun updateMarker(
         id: Int,
         name: String,
         description: String,
-        lat: Double,
-        long: Double,
-        imageName: String? = null,  // Hacer opcional
-        foto: ByteArray? = null     // Hacer opcional
+        imageName: String?,
+        imgFile: ByteArray?
     ) {
-        if (imageName != null && foto != null) {
-            storage.from("images").update(path = imageName, data = foto)
+        if (imageName != null && imgFile != null) {
+            Log.d("Cata", "comencem actualitzant l'img ")
+            storage.from("images").delete(imageName)
+            Log.d("Cata", "esborrem imgName $imageName")
+            val newImageName = uploadImage(imgFile)
+            Log.d("Cata", "new img $newImageName")
+            Log.d("Cata", "nova img bytearrray")
+            client.from("Map").update({
+                set("name", name)
+                set("description", description)
+                set("foto", newImageName)
+            }) { filter { eq("id", id) } }
+            Log.d("Cata", "id $id")
+        }
+        else {
+            Log.d("Cata", "se me va por otro lado ")
+            client.from("Map").update({
+                set("name", name)
+                set("description", description)
+            }) { filter { eq("id", id) } }
         }
 
-        client.from("Map").update({
-            set("name", name)
-            set("description", description)
-            set("lat", lat)
-            set("long", long)
-            if (imageName != null) {
-                set("foto", buildImageUrl(imageFileName = imageName))
-            }
-        }) {
-            filter { eq("id", id) }
-        }
     }
+
+//    suspend fun deleteImage(imageName: String){
+//        val imgName = imageName.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+//        client.storage.from("images").delete(imgName)
+//    }
+
+//    suspend fun deleteMarkerImageOnly(id: Int, imageUrl: String) {
+//        // 1. Eliminar del storage
+//        deleteImage(imageUrl)
+//
+//        // 2. Limpiar el campo foto en la tabla
+//        client.from("Map").update(
+//            mapOf("foto" to null)
+//        ) {
+//            filter { eq("id", id) }
+//        }
+//    }
+//
+//    //funcio per substituir una imatge
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    suspend fun replaceMarkerImage(id: Int, newImage: ByteArray, oldImageUrl: String?): String {
+//        // Eliminar imagen vieja si existe
+//        oldImageUrl?.let { deleteImage(it) }
+//
+//        // Subir nueva imagen
+//        val newImageUrl = uploadImage(newImage)
+//
+//        // Actualizar referencia en la base de datos
+//        client.from("Map").update(
+//            mapOf("foto" to newImageUrl)
+//        ) {
+//            filter { eq("id", id) }
+//        }
+//
+//        return newImageUrl
+//    }
+
+
+
 }
 
