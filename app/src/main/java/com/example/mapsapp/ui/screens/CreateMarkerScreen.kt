@@ -1,9 +1,11 @@
 package com.example.mapsapp.ui.screens
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -145,25 +147,34 @@ fun MarkerScreen(
 @Composable
 fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
     val context = LocalContext.current
-    val imageUri = remember { mutableStateOf<Uri?>(null) }
+    val imagenURI = remember { mutableStateOf<Uri?>(null) }
     val bitmap by viewModelApp.bitmap.observeAsState(null)
 
-    val takePictureLauncher =
+    val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success && imageUri.value != null) {
-                onImageCaptured(imageUri.value!!)
-                val stream = context.contentResolver.openInputStream(imageUri.value!!)
-                //guardem imatge
-                viewModelApp.setBitmap(BitmapFactory.decodeStream(stream))
-            }
-        }
-    val pickImageLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                imageUri.value = it
-                onImageCaptured(it)
-                val stream = context.contentResolver.openInputStream(it)
-                viewModelApp.setBitmap(BitmapFactory.decodeStream(stream))
+            if (success && imagenURI.value != null) {
+                onImageCaptured(imagenURI.value!!)
+
+                val stream = context.contentResolver.openInputStream(imagenURI.value!!)
+                stream?.use {
+                    val originalBitmap = BitmapFactory.decodeStream(it)
+
+                    val originalWidth = originalBitmap.width
+                    val originalHeight = originalBitmap.height
+                    val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
+
+                    val maxWidth = 800
+                    val newWidth = maxWidth
+                    val newHeight = (newWidth / aspectRatio).toInt()
+
+                    val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+
+                    viewModelApp.setBitmap(resizedBitmap)
+                } ?: run {
+                    Log.e("TakePicture", "Error al abrir InputStream para la URI de la imagen.")
+                }
+            } else {
+                Log.e("TakePicture", "La imagen no fue tomada o la URI de la imagen es nula.")
             }
         }
 
@@ -173,23 +184,20 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Selecciona una opción") },
-            text = { Text("¿Quieres tomar una foto o elegir una desde la galería?") },
+            text = { Text("¿Quieres tomar una foto?") },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
                     val uri = createImageUri(context)
-                    imageUri.value = uri
-                    takePictureLauncher.launch(uri!!)
+                    imagenURI.value = uri
+                    launcher.launch(uri!!)
                 }) {
                     Text("Tomar Foto")
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    pickImageLauncher.launch("image/*")
-                }) {
-                    Text("Elegir de Galería")
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
                 }
             }
         )
@@ -199,25 +207,25 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp),
-
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = { showDialog = true }) {
-            Text("Abrir Cámara o Galería")
+            Text("Abrir Cámara")
         }
-        if (bitmap != null) {
+        bitmap?.let {
             Image(
-                bitmap = bitmap!!.asImageBitmap(),
+                bitmap = it.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(300.dp)
+                    .size(250.dp)
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
         }
     }
 }
+
 
 
 fun createImageUri(context: Context): Uri? {
@@ -232,4 +240,3 @@ fun createImageUri(context: Context): Uri? {
         file
     )
 }
-

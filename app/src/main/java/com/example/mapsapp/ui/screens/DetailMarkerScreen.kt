@@ -117,6 +117,7 @@ fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
                 )
                 // Sección de imagen (solo si existe)
 
+
                 actualMarker?.foto?.let { fotoUrl ->
                     Row(
                         modifier = Modifier
@@ -307,7 +308,6 @@ fun CameraScreen1(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
 
 }
 
-
 fun createImageUri(context: Context): Uri? {
     val file = File.createTempFile("temp_image_", ".jpg", context.cacheDir).apply {
         createNewFile()
@@ -320,4 +320,3 @@ fun createImageUri(context: Context): Uri? {
         file
     )
 }
-

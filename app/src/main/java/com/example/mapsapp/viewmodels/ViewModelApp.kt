@@ -377,5 +377,3 @@ class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : Vie
 //    }
 
 }
-
-
