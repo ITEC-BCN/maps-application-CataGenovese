@@ -42,8 +42,7 @@ import com.example.mapsapp.R
 
 //funcio llista de markers
 @Composable
-fun ListMarkers(navigateToDetail: (Int) -> Unit) {
-    val vM = viewModel<ViewModelApp>()
+fun ListMarkers(vM: ViewModelApp, navigateToDetail: (Int) -> Unit) {
     val markerList by vM.markerList.observeAsState(emptyList<Marker>())
     vM.getAllMarkers()
 

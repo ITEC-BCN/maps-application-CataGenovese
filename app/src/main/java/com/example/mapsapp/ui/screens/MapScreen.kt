@@ -40,10 +40,11 @@ import androidx.compose.ui.Alignment
 @Composable
 //screen principal de l'app
 fun MapsScreen(
+    vM: ViewModelApp,
     navigateToDetail: (Int) -> Unit,
     navigateToMarkerScreen: (Double, Double) -> Unit,
 ) {
-    val vM = viewModel<ViewModelApp>()
+    Log.d("DANI", "Arribo al mapa")
     val markerList by vM.markerList.observeAsState(emptyList())
     val mapTypes = listOf("Normal", "Satellite", "Hybrid", "Terrain")
     val selectedMapType by vM.tipusMapa.observeAsState("Normal")

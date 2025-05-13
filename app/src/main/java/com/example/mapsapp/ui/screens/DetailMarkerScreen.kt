@@ -59,8 +59,7 @@ import java.io.File
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MarkerDetail(id: Int, navigateBack: () -> Unit) {
-    val vM = viewModel<ViewModelApp>()
+fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
     val actualMarker by vM.actualMarker.observeAsState()
     val markerName by vM.namePlace.observeAsState("")
     val markerDescription by vM.description.observeAsState("")
