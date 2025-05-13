@@ -75,12 +75,12 @@ fun PermissionsScreen(navigateToDrawer: () -> Unit) {
         if(permissions.all { permissionsStatus[it] == PermissionStatus.Granted }){
             navigateToDrawer()
         }
-        if (permissions.any { permissionsStatus[it] == PermissionStatus.Denied }) {
+        else if (permissions.any { permissionsStatus[it] == PermissionStatus.Denied }) {
             Button(onClick = { launcher.launch(permissions.toTypedArray()) }) {
                 Text("Solicitar permisos nuevamente")
             }
         }
-        if (permissions.any { permissionsStatus[it] == PermissionStatus.PermanentlyDenied }) {
+        else if (permissions.any { permissionsStatus[it] == PermissionStatus.PermanentlyDenied }) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {

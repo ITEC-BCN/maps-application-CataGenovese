@@ -10,11 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mapsapp.MyApp
 import com.example.mapsapp.SupabaseApplication
 import com.example.mapsapp.data.Marker
 import com.example.mapsapp.utils.AuthState
+import com.example.mapsapp.utils.SharedPreferencesHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,9 +21,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
-class ViewModelApp() : ViewModel() {
+class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : ViewModel() {
 
-    val database = MyApp.database
+    val supabseAuth = SupabaseApplication.supabaseAuth
+    val database = SupabaseApplication.database
 
     //img
     private val _bitmap = MutableLiveData<Bitmap?>(null)
@@ -75,7 +75,7 @@ class ViewModelApp() : ViewModel() {
     private val _selectedItem = MutableLiveData<Int>(0)
     val selectedItem = _selectedItem
 
-    private val authManager = SupabaseApplication.supabase
+    private val authManager = SupabaseApplication.supabaseAuth
 
     private val _email = MutableLiveData<String>()
     val email = _email
@@ -91,6 +91,10 @@ class ViewModelApp() : ViewModel() {
 
     private val _user = MutableLiveData<String?>()
     val user = _user
+
+//    init {
+//        checkExistingSession()
+//    }
 
 
     /*========SETTERS========*/
@@ -135,6 +139,20 @@ class ViewModelApp() : ViewModel() {
     fun setMapa(mapa: String) {
         _tipusMapa.value = mapa
     }
+
+
+//    private fun checkExistingSession() {
+//        viewModelScope.launch {
+//            val accessToken = sharedPreferences.getAccessToken()
+//            val refreshToken = sharedPreferences.getRefreshToken()
+//            when {
+//                !accessToken.isNullOrEmpty() -> refreshToken()
+//                !refreshToken.isNullOrEmpty() -> refreshToken()
+//                else -> _authState.value = AuthState.Unauthenticated
+//            }
+//        }
+//    }
+
 //    fun updateSelectedImageUri(uri: Uri?) {
 //        selectedImageUri.value = uri
 //    }
@@ -143,12 +161,21 @@ class ViewModelApp() : ViewModel() {
 
     //obtenir tots els markers
     fun getAllMarkers() {
+        Log.d("DANI", "Vaig a buscar markers")
         CoroutineScope(Dispatchers.IO).launch {
+            Log.d("DANI", "Comença la corrutina")
+            Log.d("DANI", "URL Supabase: ${database.client.supabaseUrl}")
+
             val databaseMarkers = database.getAllMarkers()
+            Log.d("DANI", "punt 1")
             withContext(Dispatchers.Main) {
+                Log.d("DANI", "punt 2")
                 _markersList.value = databaseMarkers
+                Log.d("DANI", "punt 3")
             }
+            Log.d("DANI", "Final de la corrutina")
         }
+        Log.d("DANI", "Surto de buscar markers")
     }
 
     //get marker id

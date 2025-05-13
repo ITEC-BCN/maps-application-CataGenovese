@@ -1,32 +1,29 @@
 package com.example.mapsapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.ui.navigation.Navigation
-import com.example.mapsapp.ui.screens.ListMarkers
-import com.example.mapsapp.ui.screens.MapsScreen
 import com.example.mapsapp.ui.theme.MapsAppTheme
+import com.example.mapsapp.utils.SharedPreferencesHelper
+import com.example.mapsapp.viewmodels.ViewModelFactory
 import com.example.mapsapp.viewmodels.ViewModelApp
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val viewModelApp: ViewModelApp by viewModels()
-
         setContent {
             MapsAppTheme {
-                Navigation(viewModelApp)
+                val context = LocalContext.current
+                val viewModel: ViewModelApp = viewModel(factory = ViewModelFactory(SharedPreferencesHelper(context)))
+                Navigation(viewModel)
             }
         }
     }

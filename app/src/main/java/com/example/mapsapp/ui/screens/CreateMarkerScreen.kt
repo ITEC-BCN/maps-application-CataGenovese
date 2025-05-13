@@ -1,7 +1,6 @@
 package com.example.mapsapp.ui.screens
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -41,7 +40,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import java.io.File
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -49,8 +47,7 @@ import java.io.File
 fun MarkerScreen(
     lat: Double,
     long: Double,
-    viewModelApp: ViewModelApp,
-    navigateToDetailMarker: (String) -> Unit
+    viewModelApp: ViewModelApp
 ) {
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState("")

@@ -1,8 +1,9 @@
 package com.example.mapsapp.ui.navigation
 
 import MarkerDetail
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,9 +12,8 @@ import com.example.mapsapp.ui.screens.ListMarkers
 import com.example.mapsapp.ui.screens.MapsScreen
 import com.example.mapsapp.ui.screens.MarkerScreen
 import com.example.mapsapp.viewmodels.ViewModelApp
-import com.google.maps.android.compose.MapProperties
-import org.slf4j.Marker
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InternalNavigation(
     navController: NavHostController,
@@ -23,7 +23,7 @@ fun InternalNavigation(
         //mapa -> edit marker
 
         composable<Destination.Map> {
-            MapsScreen( { id ->
+            MapsScreen(viewModelApp, { id ->
                 navController.navigate(Destination.MarkerDetail(id))
             }) { lat, long ->
                 navController.navigate(Destination.MarkerCreation(lat, long))
@@ -37,21 +37,17 @@ fun InternalNavigation(
                 lat = markerCreation.lat,
                 long = markerCreation.long,
                 viewModelApp = viewModelApp
-            ) {
-                navController.navigate(Destination.Map) {
-                    popUpTo<Destination.Map> { inclusive = true }
-                }
-            }
+            )
         }
         composable<Destination.List> {
-            ListMarkers { markerId ->
+            ListMarkers(viewModelApp) { markerId ->
                 navController.navigate(Destination.MarkerDetail(markerId))
             }
         }
 
         composable<Destination.MarkerDetail> { id ->
             val detail = id.toRoute<Destination.MarkerDetail>()
-            MarkerDetail(detail.id) {
+            MarkerDetail(viewModelApp, detail.id) {
                 navController.popBackStack()
             }
         }
