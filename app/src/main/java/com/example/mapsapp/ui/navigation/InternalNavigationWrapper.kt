@@ -48,6 +48,7 @@ fun InternalNavigation(
         composable<Destination.MarkerDetail> { id ->
             val detail = id.toRoute<Destination.MarkerDetail>()
             MarkerDetail(viewModelApp, detail.id) {
+
                 navController.popBackStack()
             }
         }

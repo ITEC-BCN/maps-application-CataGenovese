@@ -75,20 +75,6 @@ class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : Vie
     private val _selectedItem = MutableLiveData<Int>(0)
     val selectedItem = _selectedItem
 
-    private val authManager = SupabaseApplication.supabaseAuth
-
-    private val _email = MutableLiveData<String>()
-    val email = _email
-
-    private val _password = MutableLiveData<String>()
-    val password = _password
-
-    private val _authState = MutableLiveData<AuthState>()
-    val authState = _authState
-
-    private val _showError = MutableLiveData<Boolean>(false)
-    val showError = _showError
-
     private val _user = MutableLiveData<String?>()
     val user = _user
 
@@ -182,6 +168,7 @@ class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : Vie
     fun getMarker(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             val marker = database.getMarker(id)
+            Log.d("cata 08", "URL marker id: ${marker.foto}")
             withContext(Dispatchers.Main) {
                 _actualMarker.value = marker
                 _namePlace.value = marker.name

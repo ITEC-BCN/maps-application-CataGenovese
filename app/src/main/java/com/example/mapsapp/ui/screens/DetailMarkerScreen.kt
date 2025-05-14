@@ -75,9 +75,9 @@ fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
         }
     }
 
-    if (actualMarker == null) {
+    Log.d("cata 08", "acutal marker null? ${actualMarker==null}")
+        Log.d("cata 08", "marker id: ${actualMarker?.id}")
         vM.getMarker(id)
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (actualMarker != null) {
@@ -115,50 +115,52 @@ fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 )
-                // Sección de imagen (solo si existe)
 
-
-                actualMarker?.foto?.let { fotoUrl ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = fotoUrl,
-                            contentDescription = "Marker image",
-                            contentScale = ContentScale.Crop,
+                Log.d("cata", "Foto URL: ${actualMarker?.foto}")
+                if (actualMarker?.foto != null) {
+                    actualMarker?.foto?.let { fotoUrl ->
+                        Row(
                             modifier = Modifier
-                                .size(160.dp)
-                                .background(Color(0xFFEFE9E1), RoundedCornerShape(16.dp))
-                        )
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .fillMaxWidth()
+                                .padding(top = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            AsyncImage(
+                                model = fotoUrl,
+                                contentDescription = "Marker image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(160.dp)
+                                    .background(Color(0xFFEFE9E1), RoundedCornerShape(16.dp))
+                            )
 
-                            CameraScreen1(vM, onImageCaptured = { uri ->
-                                selectedImageUri = uri
-                            })
+                            Spacer(modifier = Modifier.width(16.dp))
 
-                            Button(
-                                onClick = { /* delete button */ },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFBE0000)
-                                ),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.width(140.dp)
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text("Eliminar img")
+
+                                CameraScreen1(vM, onImageCaptured = { uri ->
+                                    selectedImageUri = uri
+                                })
+
+                                Button(
+                                    onClick = { /* delete button */ },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFBE0000)
+                                    ),
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.width(140.dp)
+                                ) {
+                                    Text("Eliminar img")
+                                }
                             }
                         }
                     }
-                }
+                } else {
 
+                }
 
                 Button(
                     onClick = {
