@@ -4,12 +4,14 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.utils.AuthState
 import com.example.mapsapp.viewmodels.AuthViewModel
 
 @Composable
 fun RegisterScreen(navToHome: () -> Unit) {
+    val context = LocalContext.current
     val viewModelAuth: AuthViewModel = viewModel()
     val authState by viewModelAuth.authState.observeAsState()
     val showError by viewModelAuth.showError.observeAsState(false)
