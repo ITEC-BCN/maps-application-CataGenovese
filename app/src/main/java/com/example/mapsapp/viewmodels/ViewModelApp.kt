@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream
 class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : ViewModel() {
 
     val supabseAuth = SupabaseApplication.supabaseAuth
-    val database = SupabaseApplication.database
+    val database = SupabaseApplication.supabaseAuth
 
     //img
     private val _bitmap = MutableLiveData<Bitmap?>(null)

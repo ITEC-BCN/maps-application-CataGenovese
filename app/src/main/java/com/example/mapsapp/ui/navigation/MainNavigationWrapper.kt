@@ -16,10 +16,11 @@ import com.example.mapsapp.viewmodels.ViewModelApp
 @Composable
 fun Navigation(viewModelApp: ViewModelApp) {
     val navController = rememberNavController()
+
     NavHost(navController, Destination.Permissions) {
         composable<Destination.Permissions> {
             PermissionsScreen {
-                navController.navigate(Destination.Drawer)
+                navController.navigate(Destination.LoginRoute)
             }
         }
 

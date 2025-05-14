@@ -121,6 +121,7 @@ fun MarkerScreen(
                         foto = bitmap // Puede ser null
                     )
                     viewModelApp.setAvisCreate("Marker creado")
+                    Log.d("cata1", "marker: $")
                 }
             }
         ) {
