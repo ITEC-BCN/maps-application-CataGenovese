@@ -1,5 +1,3 @@
-package com.example.mapsapp.ui.screens
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.ui.draw.clip
@@ -114,47 +113,44 @@ fun ListMarkers(vM: ViewModelApp, navigateToDetail: (Int) -> Unit) {
     }
 }
 
-
 @Composable
 fun MarkerItem(marker: Marker, navigateToDetail: (Int) -> Unit) {
+    val imagePainter = if (!marker.foto.isNullOrEmpty()) {
+        rememberAsyncImagePainter(model = marker.foto)
+    } else {
+        painterResource(id = R.drawable.maps)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF3EEE3))
-            .border(width = 1.dp, color = Color.Black)
+            .background(Color(0xFFFDFCF8))
             .clickable { navigateToDetail(marker.id) }
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = marker.name,
-                fontSize = 18.5.sp,
-                color = Color.Black,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.weight(1f)
-            )
-
-            val imagePainter = if (!marker.foto.isNullOrEmpty()) {
-                rememberAsyncImagePainter(model = marker.foto)
-            } else {
-                painterResource(id = R.drawable.maps)
-            }
-
             Image(
                 painter = imagePainter,
                 contentDescription = "Marker image",
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
-                    .border(1.dp, Color.Gray, CircleShape)
-                    .background(Color.White, CircleShape),
+                    .background(Color.White)
+                    .border(1.dp, Color.LightGray, CircleShape),
                 contentScale = ContentScale.Crop
+            )
+
+            Text(
+                text = marker.name,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF333333),
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
-

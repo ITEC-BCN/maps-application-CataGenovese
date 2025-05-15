@@ -1,5 +1,6 @@
 package com.example.mapsapp.ui.navigation
 
+import ListMarkers
 import MarkerDetail
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,7 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.mapsapp.ui.screens.ListMarkers
 import com.example.mapsapp.ui.screens.MapsScreen
 import com.example.mapsapp.ui.screens.MarkerScreen
 import com.example.mapsapp.viewmodels.ViewModelApp

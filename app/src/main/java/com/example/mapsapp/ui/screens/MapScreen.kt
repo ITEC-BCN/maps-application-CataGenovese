@@ -18,7 +18,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.viewmodels.ViewModelApp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -28,7 +27,6 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.maps.android.compose.MapProperties
@@ -66,7 +64,7 @@ fun MapsScreen(
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .background(color = Color(0xFFF3EEE3))) {
+        .background(color = Color(0xFFBDA678))) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

@@ -77,7 +77,7 @@ fun DrawerScreen(viewModelApp: ViewModelApp) {
                         }
                     },
                     colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFFF3EEE3),
+                        containerColor = Color(0xFFBDA678),
                         titleContentColor = Color.Black
                     )
                 )
