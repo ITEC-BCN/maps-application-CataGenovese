@@ -75,9 +75,9 @@ fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
         }
     }
 
-    Log.d("cata 08", "acutal marker null? ${actualMarker==null}")
-        Log.d("cata 08", "marker id: ${actualMarker?.id}")
+    LaunchedEffect(id) {
         vM.getMarker(id)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (actualMarker != null) {

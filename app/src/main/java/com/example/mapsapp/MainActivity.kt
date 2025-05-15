@@ -21,8 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MapsAppTheme {
-                val context = LocalContext.current
-                val viewModel: ViewModelApp = viewModel(factory = ViewModelFactory(SharedPreferencesHelper(context)))
+                val viewModel: ViewModelApp = viewModel()
                 Navigation(viewModel)
             }
         }

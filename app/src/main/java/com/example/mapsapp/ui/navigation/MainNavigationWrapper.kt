@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mapsapp.ui.screens.DrawerScreen
 import com.example.mapsapp.ui.screens.Login
 import com.example.mapsapp.ui.screens.PermissionsScreen
+import com.example.mapsapp.ui.screens.RegisterScreen
 import com.example.mapsapp.viewmodels.ViewModelApp
 
 //comprueba permisos, si los tenemos navega a la pantalla drawer
@@ -21,6 +22,12 @@ fun Navigation(viewModelApp: ViewModelApp) {
         composable<Destination.Permissions> {
             PermissionsScreen {
                 navController.navigate(Destination.LoginRoute)
+            }
+        }
+
+        composable<Destination.RegistreRoute> {
+            RegisterScreen {
+                navController.navigate(Destination.Drawer)
             }
         }
 

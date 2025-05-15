@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
-class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : ViewModel() {
+class ViewModelApp : ViewModel() {
 
     val supabseAuth = SupabaseApplication.supabaseAuth
     val database = SupabaseApplication.supabaseAuth
@@ -94,6 +94,7 @@ class ViewModelApp(private val sharedPreferences: SharedPreferencesHelper) : Vie
     }
 
     fun setName(name: String) {
+        Log.d("ViewModel", "Nuevo valor de namePlace: $name")
         _namePlace.value = name
     }
 

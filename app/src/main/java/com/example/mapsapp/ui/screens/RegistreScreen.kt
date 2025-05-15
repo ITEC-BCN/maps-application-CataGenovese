@@ -19,12 +19,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.mapsapp.utils.SharedPreferencesHelper
+import com.example.mapsapp.viewmodels.ViewModelFactory
 
 @Composable
 fun RegisterScreen(navToHome: () -> Unit) {
     val context = LocalContext.current
-    val viewModelAuth: AuthViewModel = viewModel()
+    val sharedPreferencesHelper = SharedPreferencesHelper(context)
+    val factory = ViewModelFactory(sharedPreferencesHelper)
+    val viewModelAuth: AuthViewModel = viewModel(factory = factory)
     val authState by viewModelAuth.authState.observeAsState()
+
     val showError by viewModelAuth.showError.observeAsState(false)
     val email by viewModelAuth.email.observeAsState("")
     val password by viewModelAuth.password.observeAsState("")
