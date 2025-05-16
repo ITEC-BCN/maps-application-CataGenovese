@@ -124,7 +124,7 @@ fun MarkerItem(marker: Marker, navigateToDetail: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFFDFCF8))
+            .background(Color(0xFFA3773F))
             .clickable { navigateToDetail(marker.id) }
             .padding(12.dp)
     ) {
