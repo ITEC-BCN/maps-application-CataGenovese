@@ -146,7 +146,7 @@ fun MarkerDetail(vM: ViewModelApp, id: Int, navigateBack: () -> Unit) {
                                 })
 
                                 Button(
-                                    onClick = { /* delete button */ },
+                                    onClick = { vM.deleteImageFromMarker(id, actualMarker!!.foto!!)},
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(0xFFBE0000)
                                     ),

@@ -176,6 +176,25 @@ class SupabaseManager {
         }
 
     }
+    suspend fun deleteMarkerImageOnly(id: Int, imageUrl: String) {
+        try {
+            // 1. Eliminar la imagen del almacenamiento
+            val imageName = imageUrl.removePrefix("$supabaseUrl/storage/v1/object/public/images/")
+            storage.from("images").delete(imageName)
+
+            // 2. Establecer el campo `foto` en null en la tabla `Map`
+            client.from("Map").update(
+                mapOf("foto" to null)
+            ) {
+                filter { eq("id", id) }
+            }
+
+            Log.d("deleteImage", "Imagen eliminada correctamente")
+        } catch (e: Exception) {
+            Log.e("deleteImage", "Error al eliminar imagen: ${e.localizedMessage}")
+            throw e
+        }
+    }
 
 //    suspend fun deleteImage(imageName: String){
 //        val imgName = imageName.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")

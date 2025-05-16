@@ -363,5 +363,27 @@ class ViewModelApp : ViewModel() {
 //            }
 //        }
 //    }
+fun deleteImageFromMarker(id: Int, imageUrl: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            database.deleteMarkerImageOnly(id, imageUrl)
+
+            withContext(Dispatchers.Main) {
+                // Actualiza el estado del marcador actual sin imagen
+                _actualMarker.value = _actualMarker.value?.copy(foto = null)
+                _bitmap.value = null
+                _missatgeAvis.value = "Imagen eliminada correctamente"
+                delay(2000)
+                _missatgeAvis.value = null
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                _missatgeAvis.value = "Error al eliminar imagen: ${e.message}"
+                delay(2000)
+                _missatgeAvis.value = null
+            }
+        }
+    }
+}
 
 }
