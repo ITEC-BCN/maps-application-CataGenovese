@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Maps_App.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-01T23:36:26.993861300Z">
+        <DropdownSelection timestamp="2025-05-16T09:47:24.885455166Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Catalina\.android\avd\Pixel_8.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=n7qw7te6qcsc4dvg" />
             </handle>
           </Target>
         </DropdownSelection>

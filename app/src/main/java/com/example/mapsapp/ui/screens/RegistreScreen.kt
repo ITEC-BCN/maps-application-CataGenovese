@@ -1,5 +1,6 @@
 package com.example.mapsapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -39,6 +40,7 @@ fun RegisterScreen(navToHome: () -> Unit) {
     } else {
         if (showError) {
             val errorMessage = (authState as? AuthState.Error)?.message
+            Log.d("ERROR", "$errorMessage")
             if (errorMessage?.contains("invalid_credentials") == true) {
                 Toast.makeText(context, "Invalid credentials", Toast.LENGTH_LONG).show()
             } else {

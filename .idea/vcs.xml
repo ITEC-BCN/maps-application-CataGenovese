@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="/dades/cata/programacio/maps-application-CataGenovese" vcs="Git" />
   </component>
 </project>
