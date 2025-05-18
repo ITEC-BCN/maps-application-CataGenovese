@@ -4,8 +4,6 @@ import kotlinx.serialization.Serializable
 
 sealed class Destination {
 
-
-
     //permissos
     @Serializable
     object Permissions: Destination()
@@ -35,5 +33,7 @@ sealed class Destination {
     //details
     @Serializable
     data class MarkerDetail(val id: Int): Destination()
+
+
 
 }

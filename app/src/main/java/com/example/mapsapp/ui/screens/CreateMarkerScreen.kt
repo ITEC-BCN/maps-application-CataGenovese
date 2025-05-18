@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -46,22 +47,17 @@ import java.io.File
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MarkerScreen(
-    lat: Double,
-    long: Double,
-    viewModelApp: ViewModelApp
-) {
+fun MarkerScreen(lat: Double, long: Double, viewModelApp: ViewModelApp) {
     val name by viewModelApp.namePlace.observeAsState("")
     val description by viewModelApp.description.observeAsState("")
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage by viewModelApp.missatgeAvis.observeAsState()
     val bitmap by viewModelApp.bitmap.observeAsState()
+    val markerCreated by viewModelApp.markerCreated.observeAsState(false)
 
 
-
-    // Show Snackbar when there's an error message
+    // show Snackbar when there's an error message
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
             snackbarHostState.showSnackbar(it) // Show Snackbar
@@ -69,14 +65,21 @@ fun MarkerScreen(
         }
     }
 
+    LaunchedEffect(markerCreated) {
+        if (markerCreated) {
+            selectedImageUri = null
+            viewModelApp.setMarkerCreated(false)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(top= 40.dp)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // TextField for Name
         TextField(
             value = name,
             onValueChange = { viewModelApp.setName(it) },
@@ -85,15 +88,13 @@ fun MarkerScreen(
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
         )
-
-        // TextField for Description
         TextField(
             value = description,
             onValueChange = { viewModelApp.setDescription(it) },
             label = { Text(text = "Description") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 36.dp)
         )
 
         // Camera Component
@@ -101,7 +102,6 @@ fun MarkerScreen(
             selectedImageUri = uri
         })
 
-        // Button to create marker with validation
         Button(
             onClick = {
                 if (name.isBlank() || description.isBlank()) {
@@ -124,10 +124,16 @@ fun MarkerScreen(
                     Log.d("cata1", "marker: $")
                 }
             }
-        ) {
+            , modifier = Modifier
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFBCA577),
+                contentColor = Color(0xFFFFF5E1)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )  {
             Text("Create Marker")
         }
-
 
         // Snackbar Host (for notifications)
         SnackbarHost(
@@ -151,33 +157,43 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
     val imagenURI = remember { mutableStateOf<Uri?>(null) }
     val bitmap by viewModelApp.bitmap.observeAsState(null)
 
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success && imagenURI.value != null) {
-                onImageCaptured(imagenURI.value!!)
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success && imagenURI.value != null) {
+            onImageCaptured(imagenURI.value!!)
 
-                val stream = context.contentResolver.openInputStream(imagenURI.value!!)
-                stream?.use {
-                    val originalBitmap = BitmapFactory.decodeStream(it)
+            val stream = context.contentResolver.openInputStream(imagenURI.value!!)
+            stream?.use {
+                val originalBitmap = BitmapFactory.decodeStream(it)
+                val aspectRatio = originalBitmap.width.toFloat() / originalBitmap.height.toFloat()
+                val newWidth = 800
+                val newHeight = (newWidth / aspectRatio).toInt()
+                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+                viewModelApp.setBitmap(resizedBitmap)
+            } ?: run {
+                Log.e("TakePicture", "Error al abrir InputStream para la URI de la imagen.")
+            }
+        } else {
+            Log.e("TakePicture", "La imagen no fue tomada o la URI es nula.")
+        }
+    }
 
-                    val originalWidth = originalBitmap.width
-                    val originalHeight = originalBitmap.height
-                    val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
+    val pickImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            onImageCaptured(uri)
 
-                    val maxWidth = 800
-                    val newWidth = maxWidth
-                    val newHeight = (newWidth / aspectRatio).toInt()
-
-                    val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
-
-                    viewModelApp.setBitmap(resizedBitmap)
-                } ?: run {
-                    Log.e("TakePicture", "Error al abrir InputStream para la URI de la imagen.")
-                }
-            } else {
-                Log.e("TakePicture", "La imagen no fue tomada o la URI de la imagen es nula.")
+            val stream = context.contentResolver.openInputStream(uri)
+            stream?.use {
+                val originalBitmap = BitmapFactory.decodeStream(it)
+                val aspectRatio = originalBitmap.width.toFloat() / originalBitmap.height.toFloat()
+                val newWidth = 800
+                val newHeight = (newWidth / aspectRatio).toInt()
+                val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+                viewModelApp.setBitmap(resizedBitmap)
+            } ?: run {
+                Log.e("PickImage", "Error al abrir InputStream para la imagen seleccionada.")
             }
         }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -185,20 +201,23 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Selecciona una opción") },
-            text = { Text("¿Quieres tomar una foto?") },
+            text = { Text("¿Quieres tomar una foto o seleccionar de la galería?") },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
                     val uri = createImageUri(context)
                     imagenURI.value = uri
-                    launcher.launch(uri!!)
+                    cameraLauncher.launch(uri!!)
                 }) {
                     Text("Tomar Foto")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("Cancelar")
+                TextButton(onClick = {
+                    showDialog = false
+                    pickImageLauncher.launch("image/*")
+                }) {
+                    Text("Galería")
                 }
             }
         )
@@ -207,13 +226,25 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(onClick = { showDialog = true }) {
-            Text("Abrir Cámara")
+
+        Button(
+            onClick = { showDialog = true },
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFBCA577),
+                contentColor = Color(0xFFFFF5E1)
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )  {
+            Text("Seleccionar Imagen")
         }
+
+
         bitmap?.let {
             Image(
                 bitmap = it.asImageBitmap(),
@@ -226,7 +257,6 @@ fun CameraScreen(viewModelApp: ViewModelApp, onImageCaptured: (Uri) -> Unit) {
         }
     }
 }
-
 
 
 fun createImageUri(context: Context): Uri? {

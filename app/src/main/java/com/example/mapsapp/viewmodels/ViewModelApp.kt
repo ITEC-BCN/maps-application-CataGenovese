@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream
 
 class ViewModelApp : ViewModel() {
 
-    val supabseAuth = SupabaseApplication.supabaseAuth
     val database = SupabaseApplication.supabaseAuth
 
     //img
@@ -64,9 +63,6 @@ class ViewModelApp : ViewModel() {
     // El estado del snackbar
     val snackbarHostState = SnackbarHostState()
 
-    //searcchbar
-    private val _searchBar = MutableLiveData("")
-    val searchBar: LiveData<String> = _searchBar
 
     //tipos de mapa
     private val _tipusMapa = MutableLiveData<String>()
@@ -78,12 +74,15 @@ class ViewModelApp : ViewModel() {
     private val _user = MutableLiveData<String?>()
     val user = _user
 
-//    init {
-//        checkExistingSession()
-//    }
+    private val _markerCreated = MutableLiveData<Boolean>(false)
+    val markerCreated: LiveData<Boolean> = _markerCreated
 
 
     /*========SETTERS========*/
+
+    fun setMarkerCreated(value: Boolean) {
+        _markerCreated.value = value
+    }
 
     fun setBitmap(bitmap: Bitmap) {
         _bitmap.value = bitmap
@@ -96,10 +95,6 @@ class ViewModelApp : ViewModel() {
     fun setName(name: String) {
         Log.d("ViewModel", "Nuevo valor de namePlace: $name")
         _namePlace.value = name
-    }
-
-    fun setSearchText(text: String) {
-        _searchBar.value = text
     }
 
     fun setExpanded(expanded: Boolean) {
@@ -127,42 +122,22 @@ class ViewModelApp : ViewModel() {
         _tipusMapa.value = mapa
     }
 
-
-//    private fun checkExistingSession() {
-//        viewModelScope.launch {
-//            val accessToken = sharedPreferences.getAccessToken()
-//            val refreshToken = sharedPreferences.getRefreshToken()
-//            when {
-//                !accessToken.isNullOrEmpty() -> refreshToken()
-//                !refreshToken.isNullOrEmpty() -> refreshToken()
-//                else -> _authState.value = AuthState.Unauthenticated
-//            }
-//        }
-//    }
-
-//    fun updateSelectedImageUri(uri: Uri?) {
-//        selectedImageUri.value = uri
-//    }
-
     /*CRUD*/
-
-    //obtenir tots els markers
+    //get tots els markers
     fun getAllMarkers() {
-        Log.d("DANI", "Vaig a buscar markers")
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d("DANI", "Comença la corrutina")
-            Log.d("DANI", "URL Supabase: ${database.client.supabaseUrl}")
+            Log.d("cata 01", "URL Supabase: ${database.client.supabaseUrl}")
 
             val databaseMarkers = database.getAllMarkers()
-            Log.d("DANI", "punt 1")
+            Log.d("cata 01", "punt 1")
             withContext(Dispatchers.Main) {
-                Log.d("DANI", "punt 2")
+                Log.d("cata 01", "punt 2")
                 _markersList.value = databaseMarkers
-                Log.d("DANI", "punt 3")
+                Log.d("cata 01", "punt 3")
             }
-            Log.d("DANI", "Final de la corrutina")
+            Log.d("cata 01", "Final de la corrutina")
         }
-        Log.d("DANI", "Surto de buscar markers")
+        Log.d("cata 01", "Surto de buscar markers")
     }
 
     //get marker id
@@ -224,7 +199,7 @@ class ViewModelApp : ViewModel() {
                     _description.value = ""
                     _bitmap.value = null
                     selectedImageUri.value = null
-
+                    _markerCreated.value = true
                     _missatgeAvis.value = "Marker creado correctamente"
                     delay(2000)
                     _missatgeAvis.value = null
@@ -276,6 +251,29 @@ class ViewModelApp : ViewModel() {
         }
     }
 
+    //funcio per eliminar una imatge del marker
+    fun deleteImageFromMarker(id: Int, imageUrl: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                database.deleteMarkerImageOnly(id, imageUrl)
+
+                withContext(Dispatchers.Main) {
+                    // Actualiza el estado del marcador actual sin imagen
+                    _actualMarker.value = _actualMarker.value?.copy(foto = null)
+                    _bitmap.value = null
+                    _missatgeAvis.value = "Imagen eliminada correctamente"
+                    delay(2000)
+                    _missatgeAvis.value = null
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _missatgeAvis.value = "Error al eliminar imagen: ${e.message}"
+                    delay(2000)
+                    _missatgeAvis.value = null
+                }
+            }
+        }
+    }
 
     //funció per veure si hi ha dades d’usuari a SharedPreferences:
 //    private fun checkExistingSession() {
@@ -290,11 +288,7 @@ class ViewModelApp : ViewModel() {
 //        }
 //    }
 
-
-
-
-
-    //    //actualitzar un marker
+    //actualitzar un marker
 //    fun updateMarker(
 //        id: Int,
 //        name: String,
@@ -363,27 +357,6 @@ class ViewModelApp : ViewModel() {
 //            }
 //        }
 //    }
-fun deleteImageFromMarker(id: Int, imageUrl: String) {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            database.deleteMarkerImageOnly(id, imageUrl)
 
-            withContext(Dispatchers.Main) {
-                // Actualiza el estado del marcador actual sin imagen
-                _actualMarker.value = _actualMarker.value?.copy(foto = null)
-                _bitmap.value = null
-                _missatgeAvis.value = "Imagen eliminada correctamente"
-                delay(2000)
-                _missatgeAvis.value = null
-            }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                _missatgeAvis.value = "Error al eliminar imagen: ${e.message}"
-                delay(2000)
-                _missatgeAvis.value = null
-            }
-        }
-    }
-}
 
 }

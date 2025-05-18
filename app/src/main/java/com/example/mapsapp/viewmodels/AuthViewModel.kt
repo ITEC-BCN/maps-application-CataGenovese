@@ -26,7 +26,7 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper) : Vi
         checkExistingSession()
     }
 
-
+    //funcio per verificar si l'usuari existeix o no
     private fun checkExistingSession() {
         viewModelScope.launch {
             val accessToken = sharedPreferences.getAccessToken()
@@ -38,6 +38,8 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper) : Vi
             }
         }
     }
+
+    /* SETTERS */
 
     fun editEmail(value: String) {
         _email.value = value
@@ -52,6 +54,7 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper) : Vi
     }
 
 
+    //funció per registrarse
     fun signUp() {
         viewModelScope.launch {
             _authState.value = authManager.signUpWithEmail(_email.value!!, _password.value!!)
@@ -67,6 +70,7 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper) : Vi
         }
     }
 
+    //funcio per fer login
     fun signIn() {
         viewModelScope.launch {
             _authState.value = authManager.signInWithEmail(_email.value!!, _password.value!!)
@@ -81,6 +85,7 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper) : Vi
             }
         }
     }
+
 
     private fun refreshToken() {
         viewModelScope.launch {

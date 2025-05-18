@@ -38,7 +38,11 @@ fun Navigation(viewModelApp: ViewModelApp) {
         }
 
         composable<Destination.Drawer> {
-            DrawerScreen(viewModelApp)
+            DrawerScreen(viewModelApp) {
+                navController.navigate(Destination.LoginRoute) {
+                    popUpTo(Destination.Permissions) { inclusive = true }
+                }
+            }
         }
     }
 }
